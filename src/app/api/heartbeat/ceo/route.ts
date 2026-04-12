@@ -51,19 +51,19 @@ ${context}
 
   const start = Date.now()
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
+    model: 'claude-opus-4-6',
     max_tokens: 1500,
     messages: [{ role: 'user', content: prompt }],
     system: 'あなたは経験豊富なスタートアップCEOです。データに基づいて簡潔・具体的に判断します。',
   })
 
   const content = response.content[0].type === 'text' ? response.content[0].text : ''
-  const costUsd = (response.usage.input_tokens / 1_000_000 * 3.0) + (response.usage.output_tokens / 1_000_000 * 15.0)
+  const costUsd = (response.usage.input_tokens / 1_000_000 * 15.0) + (response.usage.output_tokens / 1_000_000 * 75.0)
 
   // 実行ログをSupabaseに保存
   await supabase.from('agent_runs').insert({
     startup_id: startups[0].id, // CEO は全体担当なので代表1件
-    model: 'claude-sonnet-4-6',
+    model: 'claude-opus-4-6',
     tokens_input: response.usage.input_tokens,
     tokens_output: response.usage.output_tokens,
     cost_usd: costUsd,

@@ -52,19 +52,19 @@ export async function GET(req: NextRequest) {
     if (!task) continue
 
     const response = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
+      model: 'claude-sonnet-4-6',
       max_tokens: 800,
       messages: [{ role: 'user', content: task.prompt }],
       system: `あなたは${task.role}です。実行可能で具体的な提案を日本語で行います。`,
     })
 
     const content = response.content[0].type === 'text' ? response.content[0].text : ''
-    const costUsd = (response.usage.input_tokens / 1_000_000 * 1.0) + (response.usage.output_tokens / 1_000_000 * 5.0)
+    const costUsd = (response.usage.input_tokens / 1_000_000 * 3.0) + (response.usage.output_tokens / 1_000_000 * 15.0)
     totalCost += costUsd
 
     await supabase.from('agent_runs').insert({
       startup_id: startup.id,
-      model: 'claude-haiku-4-5-20251001',
+      model: 'claude-sonnet-4-6',
       tokens_input: response.usage.input_tokens,
       tokens_output: response.usage.output_tokens,
       cost_usd: costUsd,
