@@ -1,25 +1,33 @@
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
+import { createServiceClient } from '@/lib/supabase/client'
 import StartupCard from '@/components/StartupCard'
 import AgentActivityFeed from '@/components/AgentActivityFeed'
 import BudgetGauge from '@/components/BudgetGauge'
 
 async function getDashboardData() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-    const res = await fetch(`${baseUrl}/api/dashboard/data`, { cache: 'no-store' })
-    if (!res.ok) return null
-    return res.json()
+    const supabase = createServiceClient()
+    const [startupsRes, experimentsRes, runsRes, budgetRes] = await Promise.all([
+      supabase.from('startups').select('id, name, status, business_type, experiment_count, pivot_count, created_at').order('created_at'),
+      supabase.from('experiments').select('id, startup_id, hypothesis, metric, target_value, status, result, started_at, completed_at').order('created_at'),
+      supabase.from('agent_runs').select('id, startup_id, model, task_type, cost_usd, created_at').order('created_at', { ascending: false }).limit(10),
+      supabase.from('token_budgets').select('*').limit(1).single(),
+    ])
+    return {
+      startups: startupsRes.data ?? [],
+      experiments: experimentsRes.data ?? [],
+      recentRuns: runsRes.data ?? [],
+      budget: budgetRes.data ?? null,
+    }
   } catch {
-    return null
+    return { startups: [], experiments: [], recentRuns: [], budget: null }
   }
 }
 
 export default async function DashboardPage() {
-  const data = await getDashboardData()
-  const startups: any[] = data?.startups ?? []
-  const experiments: any[] = data?.experiments ?? []
-  const recentRuns: any[] = data?.recentRuns ?? []
-  const budget = data?.budget ?? null
+  const { startups, experiments, recentRuns, budget } = await getDashboardData()
 
   const startupNames: Record<string, string> = Object.fromEntries(
     startups.map((s: any) => [s.id, s.name])
@@ -35,14 +43,13 @@ export default async function DashboardPage() {
 
   const stats = [
     { label: '実験中', value: runningExps, sub: `/ ${experiments.length} 実験`, color: 'text-green-400' },
-    { label: '完了実験', value: successExps, sub: `成功 ${experiments.length > 0 ? Math.round(successExps / experiments.length * 100) : 0}%`, color: 'text-blue-400' },
+    { label: '完了実験', value: successExps, sub: experiments.length > 0 ? `成功 ${Math.round(successExps / experiments.length * 100)}%` : '-', color: 'text-blue-400' },
     { label: '今月コスト', value: `$${Number(totalCost).toFixed(2)}`, sub: budget ? `/ $${Number(budget.total_usd).toFixed(0)} 予算` : '予算未設定', color: 'text-purple-400' },
-    { label: '稼働日数', value: `${daysSinceStart}日`, sub: `/ 30日 残り${Math.max(0, 30 - daysSinceStart)}日`, color: 'text-orange-400' },
+    { label: '稼働日数', value: `${daysSinceStart}日`, sub: `残り ${Math.max(0, 30 - daysSinceStart)}日`, color: 'text-orange-400' },
   ]
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      {/* ヘッダー */}
       <header className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold tracking-tight">🚀 Launchpad Mission Control</h1>
@@ -94,9 +101,8 @@ export default async function DashboardPage() {
           )}
         </div>
 
-        {/* 下段: 実験進捗 + CXOアクティビティ */}
+        {/* 実験進捗 + CXOアクティビティ */}
         <div className="grid md:grid-cols-2 gap-6">
-          {/* 実験トラッカー */}
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
             <h3 className="text-sm font-medium text-gray-400 mb-4">実験トラッカー (30実験)</h3>
             <div className="grid grid-cols-10 gap-1 mb-4">
@@ -105,10 +111,10 @@ export default async function DashboardPage() {
                 return (
                   <div
                     key={i}
-                    title={exp ? `#${i + 1}: ${exp.hypothesis?.slice(0, 40)}...` : `実験 #${i + 1}`}
-                    className={`w-5 h-5 rounded-sm transition-colors ${
+                    title={exp ? `#${i + 1}: ${exp.hypothesis?.slice(0, 40)}` : `実験 #${i + 1}`}
+                    className={`w-5 h-5 rounded-sm ${
                       exp?.status === 'success' ? 'bg-green-500' :
-                      exp?.status === 'running' ? 'bg-purple-500 animate-pulse' :
+                      exp?.status === 'running' ? 'bg-purple-500' :
                       exp?.status === 'failed' ? 'bg-red-700' :
                       'bg-gray-800'
                     }`}
@@ -143,7 +149,6 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          {/* CXOアクティビティ + 予算 */}
           <div className="space-y-4">
             <AgentActivityFeed runs={recentRuns} startupNames={startupNames} />
             <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col items-center">
@@ -157,7 +162,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* GitHub Pages サイトリンク */}
+        {/* 公開サイトリンク */}
         <div>
           <h2 className="text-sm font-medium text-gray-400 mb-3">公開サイト</h2>
           <div className="grid md:grid-cols-3 gap-3">
@@ -174,10 +179,10 @@ export default async function DashboardPage() {
                 className="bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-xl p-4 flex items-center justify-between group transition-colors"
               >
                 <div>
-                  <p className="text-sm font-medium text-white group-hover:text-white">{site.name}</p>
+                  <p className="text-sm font-medium text-white">{site.name}</p>
                   <p className={`text-xs ${site.color} mt-0.5`}>{site.type}</p>
                 </div>
-                <svg className="w-4 h-4 text-gray-600 group-hover:text-gray-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4 text-gray-600 group-hover:text-gray-300 transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </a>
