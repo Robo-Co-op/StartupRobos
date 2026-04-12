@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Launchpad — 難民起業家アクセラレーター",
-  description: "AIエージェントで1人3スタートアップ、30日30ピボット",
+  title: "Launchpad Mission Control",
+  description: "Mission Control Dashboard — Read-only view of startup experiments",
 };
 
 export default function RootLayout({

@@ -1,48 +1,56 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { getSupabaseClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import BudgetGauge from '@/components/BudgetGauge'
 import PivotCounter from '@/components/PivotCounter'
 
-export default async function DashboardPage() {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+// TODO: Add user context via .env or URL param
+export default function DashboardPage() {
+  const [loading, setLoading] = useState(true)
+  const [startups, setStartups] = useState<any[]>([])
+  const [budget, setBudget] = useState<any>(null)
+  const [error, setError] = useState('')
 
-  const [
-    { data: profile },
-    { data: startups },
-    { data: budget },
-    { data: subscription },
-  ] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', user.id).single(),
-    supabase.from('startups').select('id, name, status, pivot_count, business_type, experiment_count, created_at').eq('user_id', user.id).order('created_at'),
-    supabase.from('token_budgets').select('*').eq('user_id', user.id).single(),
-    supabase.from('subscriptions').select('*').eq('user_id', user.id).single(),
-  ])
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const supabase = getSupabaseClient()
 
-  if (!subscription) redirect('/pricing')
+        const [startupsRes, budgetRes] = await Promise.all([
+          supabase.from('startups').select('id, name, status, pivot_count, business_type, experiment_count, created_at').order('created_at'),
+          supabase.from('token_budgets').select('*').limit(1).single(),
+        ])
 
-  // オンボーディング未完了ならリダイレクト
-  if (!profile?.onboarding_complete) redirect('/dashboard/onboarding')
+        setStartups(startupsRes.data || [])
+        setBudget(budgetRes.data || null)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load data')
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  const startupList = startups ?? []
-  const earliestStartup = startupList[0]
+    loadData()
+  }, [])
+
+  const earliestStartup = startups[0]
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+        <div className="animate-spin text-base">⟳</div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <header className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold">Launchpad</h1>
-          <p className="text-sm text-gray-400">{profile?.full_name ?? user.email}</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-xs bg-purple-900/50 border border-purple-800 text-purple-300 px-3 py-1 rounded-full capitalize">
-            {subscription?.plan}
-          </span>
-          <form action="/api/auth/signout" method="post">
-            <button className="text-sm text-gray-500 hover:text-gray-300">ログアウト</button>
-          </form>
+          <h1 className="text-xl font-bold">Launchpad Mission Control</h1>
+          <p className="text-sm text-gray-400">Read-only Dashboard</p>
         </div>
       </header>
 
@@ -66,7 +74,7 @@ export default async function DashboardPage() {
           <div className="md:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-6">
             <h2 className="text-sm font-medium text-gray-400 mb-4">実験進捗</h2>
             <PivotCounter
-              startups={startupList.map((s) => ({
+              startups={startups.map((s) => ({
                 id: s.id,
                 name: s.name,
                 pivotCount: s.experiment_count ?? s.pivot_count,
@@ -79,29 +87,15 @@ export default async function DashboardPage() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">スタートアップ</h2>
-            {startupList.length < 3 && (
-              <Link
-                href="/dashboard/startups/new"
-                className="text-sm bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                + 新規作成
-              </Link>
-            )}
           </div>
 
-          {startupList.length === 0 ? (
+          {startups.length === 0 ? (
             <div className="bg-gray-900 border border-dashed border-gray-700 rounded-2xl p-12 text-center">
-              <p className="text-gray-500 mb-4">まだスタートアップがありません</p>
-              <Link
-                href="/dashboard/startups/new"
-                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors"
-              >
-                最初のスタートアップを作成
-              </Link>
+              <p className="text-gray-500 mb-4">データなし</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-4">
-              {startupList.map((startup) => (
+              {startups.map((startup) => (
                 <Link key={startup.id} href={`/dashboard/startups/${startup.id}`}>
                   <div className="bg-gray-900 border border-gray-800 hover:border-purple-700 rounded-xl p-5 transition-colors cursor-pointer">
                     <div className="flex items-start justify-between mb-3">
@@ -121,14 +115,6 @@ export default async function DashboardPage() {
                     <div className="text-sm text-gray-400">
                       実験: {startup.experiment_count ?? startup.pivot_count}/10
                     </div>
-                  </div>
-                </Link>
-              ))}
-
-              {Array.from({ length: 3 - startupList.length }).map((_, i) => (
-                <Link key={`empty-${i}`} href="/dashboard/startups/new">
-                  <div className="bg-gray-900 border border-dashed border-gray-700 hover:border-purple-700 rounded-xl p-5 transition-colors cursor-pointer flex items-center justify-center h-[100px]">
-                    <span className="text-gray-600 text-sm">+ スロット {startupList.length + i + 1}</span>
                   </div>
                 </Link>
               ))}

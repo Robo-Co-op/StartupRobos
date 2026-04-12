@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/client'
 import { maskPII } from '@/lib/security/piiMasker'
 import { runCouncil } from '@/lib/agent/council'
@@ -25,12 +24,11 @@ const requestSchema = z.object({
   agenda: z.string().min(10).max(2000),
 })
 
+// TODO: Add API key auth for Mission Control
 export async function POST(req: NextRequest) {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
-
-  if (!checkRateLimit(user.id)) {
+  // レート制限チェック (3回/分) — using IP-based limiting for now
+  const ip = req.headers.get('x-forwarded-for') || 'unknown'
+  if (!checkRateLimit(ip)) {
     return NextResponse.json({ error: 'CXO会議は1分間に3回までです' }, { status: 429 })
   }
 
@@ -43,28 +41,15 @@ export async function POST(req: NextRequest) {
   const { startupId, agenda } = parsed.data
   const supabaseService = createServiceClient()
 
-  // スタートアップの所有権確認 + コンテキスト取得
+  // スタートアップ取得 + コンテキスト
   const { data: startup } = await supabaseService
     .from('startups')
-    .select('id, name, description, status, pivot_count')
+    .select('id, user_id, name, description, status, pivot_count')
     .eq('id', startupId)
-    .eq('user_id', user.id)
     .single()
 
   if (!startup) {
     return NextResponse.json({ error: 'スタートアップが見つかりません' }, { status: 404 })
-  }
-
-  // サブスクリプション確認 (有料プランのみCXO会議利用可)
-  const { data: subscription } = await supabaseService
-    .from('subscriptions')
-    .select('plan, status')
-    .eq('user_id', user.id)
-    .eq('status', 'active')
-    .single()
-
-  if (!subscription) {
-    return NextResponse.json({ error: 'CXO会議は有料プランが必要です' }, { status: 403 })
   }
 
   const startupContext = [
@@ -78,7 +63,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const result = await runCouncil(
-      user.id,
+      startup.user_id ?? 'anonymous',
       startupId,
       startupContext,
       sanitizedAgenda,

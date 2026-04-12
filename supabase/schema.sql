@@ -79,6 +79,7 @@ create table token_budgets (
 );
 
 -- Stripe サブスクリプション
+-- Legacy: kept for future web app
 create table subscriptions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id),

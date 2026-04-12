@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/client'
 import { z } from 'zod'
 
@@ -12,11 +11,8 @@ const requestSchema = z.object({
   reason: z.string().max(1000).optional(),
 })
 
+// TODO: Add API key auth for Mission Control
 export async function POST(req: NextRequest) {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
-
   const body = await req.json()
   const parsed = requestSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: '入力値が無効です' }, { status: 400 })
@@ -28,7 +24,6 @@ export async function POST(req: NextRequest) {
     .from('startups')
     .select('pivot_count')
     .eq('id', startupId)
-    .eq('user_id', user.id)
     .single()
 
   if (!startup) return NextResponse.json({ error: 'スタートアップが見つかりません' }, { status: 404 })

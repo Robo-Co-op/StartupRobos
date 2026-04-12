@@ -1,35 +1,66 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { redirect, notFound } from 'next/navigation'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useParams, notFound } from 'next/navigation'
 import Link from 'next/link'
-import AgentChat from '@/components/AgentChat'
+import { getSupabaseClient } from '@/lib/supabase/client'
 import CXOBoard from '@/components/CXOBoard'
 
-interface Props {
-  params: Promise<{ id: string }>
-}
+// TODO: Add user context via .env or URL param
+export default function StartupDetailPage() {
+  const params = useParams()
+  const id = params.id as string
+  const [loading, setLoading] = useState(true)
+  const [startup, setStartup] = useState<any>(null)
+  const [pivotLogs, setPivotLogs] = useState<any[]>([])
+  const [error, setError] = useState('')
 
-export default async function StartupDetailPage({ params }: Props) {
-  const { id } = await params
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const supabase = getSupabaseClient()
 
-  const [{ data: startup }, { data: pivotLogs }] = await Promise.all([
-    supabase
-      .from('startups')
-      .select('*')
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .single(),
-    supabase
-      .from('pivot_log')
-      .select('*')
-      .eq('startup_id', id)
-      .order('created_at', { ascending: false })
-      .limit(20),
-  ])
+        const [startupRes, logsRes] = await Promise.all([
+          supabase
+            .from('startups')
+            .select('*')
+            .eq('id', id)
+            .single(),
+          supabase
+            .from('pivot_log')
+            .select('*')
+            .eq('startup_id', id)
+            .order('created_at', { ascending: false })
+            .limit(20),
+        ])
 
-  if (!startup) notFound()
+        setStartup(startupRes.data || null)
+        setPivotLogs(logsRes.data || [])
+
+        if (!startupRes.data) {
+          notFound()
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load startup')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
+  }, [id])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+        <div className="animate-spin text-base">⟳</div>
+      </div>
+    )
+  }
+
+  if (!startup) {
+    notFound()
+  }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -55,6 +86,12 @@ export default async function StartupDetailPage({ params }: Props) {
 
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
 
+        {error && (
+          <div className="p-3 bg-red-900/30 border border-red-800 rounded-lg text-red-300 text-sm">
+            {error}
+          </div>
+        )}
+
         {/* CXO マルチエージェント会議 */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-5">
@@ -65,12 +102,6 @@ export default async function StartupDetailPage({ params }: Props) {
             CEO・CTO・CMO・COO・CFO の5つのAIエージェントが並列で会議を行い、戦略的意思決定を行います。
           </p>
           <CXOBoard startupId={startup.id} />
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8">
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-          <h2 className="text-base font-semibold mb-5">AIエージェント</h2>
-          <AgentChat startupId={startup.id} />
         </div>
 
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
@@ -101,9 +132,8 @@ export default async function StartupDetailPage({ params }: Props) {
               ))}
             </div>
           ) : (
-            <p className="text-gray-600 text-sm">まだピボットログがありません。エージェントを使ってピボット判断を行いましょう。</p>
+            <p className="text-gray-600 text-sm">ピボットログなし</p>
           )}
-        </div>
         </div>
       </main>
     </div>

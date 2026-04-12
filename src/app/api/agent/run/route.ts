@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { runAgent, AgentConfig } from '@/lib/agent/harness'
 import { createServiceClient } from '@/lib/supabase/client'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { maskPII } from '@/lib/security/piiMasker'
 import { z } from 'zod'
 
@@ -27,13 +26,11 @@ const requestSchema = z.object({
   prompt: z.string().min(1).max(5000),
 })
 
+// TODO: Add API key auth for Mission Control
 export async function POST(req: NextRequest) {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
-
-  // レート制限チェック (10リクエスト/分)
-  if (!checkRateLimit(user.id)) {
+  // レート制限チェック (10リクエスト/分) — using IP-based limiting for now
+  const ip = req.headers.get('x-forwarded-for') || 'unknown'
+  if (!checkRateLimit(ip)) {
     return NextResponse.json({ error: 'リクエスト制限を超えました。1分後に再試行してください' }, { status: 429 })
   }
 
@@ -47,12 +44,11 @@ export async function POST(req: NextRequest) {
 
   const supabaseService = createServiceClient()
 
-  // スタートアップの所有権確認
+  // スタートアップ確認
   const { data: startup } = await supabaseService
     .from('startups')
-    .select('id')
+    .select('id, user_id')
     .eq('id', startupId)
-    .eq('user_id', user.id)
     .single()
 
   if (!startup) {
@@ -61,9 +57,11 @@ export async function POST(req: NextRequest) {
 
   // PII マスク処理
   const sanitizedPrompt = maskPII(prompt)
-  const config: AgentConfig = { userId: user.id, startupId, taskType }
+  // TODO: Add user context via API key auth
+  const config: AgentConfig = { userId: startup.user_id ?? 'anonymous', startupId, taskType }
 
   try {
+    // Use startup context without user_id since we're doing public read
     const result = await runAgent(config, sanitizedPrompt, supabaseService)
     return NextResponse.json(result)
   } catch (err: unknown) {

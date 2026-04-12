@@ -9,11 +9,10 @@ const nextConfig: NextConfig = {
           key: "Content-Security-Policy",
           value: [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com",
+            "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
             "style-src 'self' 'unsafe-inline'",
             "img-src 'self' data: https:",
-            "connect-src 'self' https://api.anthropic.com https://*.supabase.co https://api.stripe.com",
-            "frame-src https://js.stripe.com https://hooks.stripe.com",
+            "connect-src 'self' https://api.anthropic.com https://*.supabase.co",
             "font-src 'self'",
           ].join("; "),
         },
