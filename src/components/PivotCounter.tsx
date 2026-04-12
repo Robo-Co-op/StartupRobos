@@ -26,7 +26,7 @@ export default function PivotCounter({ startups, startDate }: PivotCounterProps)
       {/* 30マスグリッド */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-300">ピボット進捗</span>
+          <span className="text-sm font-medium text-gray-300">実験進捗</span>
           <span className="text-sm text-gray-400">{totalPivots} / {MAX_PIVOTS}</span>
         </div>
         <div className="grid grid-cols-10 gap-1">
@@ -38,7 +38,7 @@ export default function PivotCounter({ startups, startDate }: PivotCounterProps)
                   ? 'bg-purple-500'
                   : 'bg-gray-700'
               }`}
-              title={`ピボット ${i + 1}`}
+              title={`実験 ${i + 1}`}
             />
           ))}
         </div>

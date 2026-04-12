@@ -9,6 +9,10 @@ create table profiles (
   current_country text,
   refugee_status text check (refugee_status in ('refugee', 'asylum_seeker', 'stateless', 'other')),
   cohort_id uuid,
+  onboarding_complete boolean default false,
+  languages text[],
+  region text,
+  monthly_budget_usd numeric default 500,
   created_at timestamptz default now()
 );
 
@@ -19,7 +23,10 @@ create table startups (
   name text not null,
   description text,
   status text default 'active' check (status in ('active', 'pivoted', 'paused', 'graduated')),
-  pivot_count int default 0,
+  pivot_count int default 0, -- legacy: kept for backwards compatibility
+  business_type text,
+  experiment_count int default 0,
+  max_experiments int default 10,
   created_at timestamptz default now()
 );
 
@@ -44,6 +51,20 @@ create table agent_runs (
   tokens_output int,
   cost_usd numeric(10,6),
   task_type text,
+  created_at timestamptz default now()
+);
+
+-- 実験
+create table experiments (
+  id uuid primary key default gen_random_uuid(),
+  startup_id uuid references startups(id) on delete cascade,
+  hypothesis text not null,
+  metric text not null,
+  target_value text,
+  status text default 'pending' check (status in ('pending','running','success','failed','pivoted')),
+  result text,
+  started_at timestamptz,
+  completed_at timestamptz,
   created_at timestamptz default now()
 );
 
@@ -76,6 +97,7 @@ alter table pivot_log enable row level security;
 alter table agent_runs enable row level security;
 alter table token_budgets enable row level security;
 alter table subscriptions enable row level security;
+alter table experiments enable row level security;
 
 -- RLS ポリシー
 create policy "Users own their profile" on profiles
@@ -102,3 +124,11 @@ create policy "Users see their budget" on token_budgets
 
 create policy "Users see their subscription" on subscriptions
   for all using (auth.uid() = user_id);
+
+create policy "Users see own experiments" on experiments
+  for all using (auth.uid() = (select user_id from startups where id = startup_id));
+
+-- インデックス
+create index idx_startups_user_id on startups(user_id);
+create index idx_agent_runs_user_id on agent_runs(user_id);
+create index idx_experiments_startup_id on experiments(startup_id);
