@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/heartbeat/ceo",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/heartbeat/cxo",
+      "schedule": "0 12 * * *"
+    }
+  ]
+}
