@@ -6,16 +6,16 @@ const SITE_URLS: Record<string, string> = {
   game_ads: 'https://robo-co-op.github.io/puzzle-games/',
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  affiliate_seo: 'Affiliate / SEO',
-  digital_product: 'Digital Product',
-  game_ads: 'Game + Ads',
+const TYPE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  affiliate_seo: { label: 'Affiliate / SEO', color: '#3b82f6', bg: 'rgba(59,130,246,0.08)' },
+  digital_product: { label: 'Digital Product', color: '#a855f7', bg: 'rgba(168,85,247,0.08)' },
+  game_ads: { label: 'Game + Ads', color: '#22c55e', bg: 'rgba(34,197,94,0.08)' },
 }
 
-const TYPE_COLORS: Record<string, string> = {
-  affiliate_seo: 'bg-blue-900/40 text-blue-300 border-blue-700/40',
-  digital_product: 'bg-purple-900/40 text-purple-300 border-purple-700/40',
-  game_ads: 'bg-green-900/40 text-green-300 border-green-700/40',
+const STATUS_STYLES: Record<string, string> = {
+  active: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+  pivoted: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
+  graduated: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
 }
 
 interface Experiment {
@@ -42,28 +42,29 @@ interface StartupCardProps {
 
 export default function StartupCard({ startup, experiments }: StartupCardProps) {
   const siteUrl = startup.business_type ? SITE_URLS[startup.business_type] : null
-  const typeLabel = startup.business_type ? TYPE_LABELS[startup.business_type] : null
-  const typeColor = startup.business_type ? TYPE_COLORS[startup.business_type] : 'bg-gray-800 text-gray-400 border-gray-700'
+  const typeConfig = startup.business_type ? TYPE_CONFIG[startup.business_type] : null
   const activeExp = experiments.find(e => e.status === 'running') ?? experiments[0]
   const expCount = startup.experiment_count ?? startup.pivot_count
 
   return (
-    <div className="bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-xl p-5 transition-colors flex flex-col gap-3">
+    <div className="card p-4 flex flex-col gap-3 group">
       {/* ヘッダー */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-white truncate">{startup.name}</h3>
-          {typeLabel && (
-            <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full border ${typeColor}`}>
-              {typeLabel}
+          <h3 className="text-[13px] font-semibold text-zinc-200 truncate group-hover:text-white transition-colors">
+            {startup.name}
+          </h3>
+          {typeConfig && (
+            <span
+              className="inline-block mt-1.5 text-[10px] px-2 py-0.5 rounded-full font-medium"
+              style={{ backgroundColor: typeConfig.bg, color: typeConfig.color }}
+            >
+              {typeConfig.label}
             </span>
           )}
         </div>
-        <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full ${
-          startup.status === 'active' ? 'bg-green-900/50 text-green-400' :
-          startup.status === 'pivoted' ? 'bg-orange-900/50 text-orange-400' :
-          startup.status === 'graduated' ? 'bg-blue-900/50 text-blue-400' :
-          'bg-gray-800 text-gray-400'
+        <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full ${
+          STATUS_STYLES[startup.status] ?? 'bg-zinc-800 text-zinc-500'
         }`}>
           {startup.status}
         </span>
@@ -71,30 +72,30 @@ export default function StartupCard({ startup, experiments }: StartupCardProps) 
 
       {/* 実験 */}
       {activeExp && (
-        <div className="bg-gray-800/60 rounded-lg p-3 text-xs space-y-1">
+        <div className="bg-zinc-900/50 border border-[#1c1c22] rounded-lg p-3 space-y-1.5">
           <div className="flex items-center gap-1.5">
-            <span className={`w-1.5 h-1.5 rounded-full ${
-              activeExp.status === 'running' ? 'bg-green-400 animate-pulse' :
-              activeExp.status === 'success' ? 'bg-blue-400' :
-              activeExp.status === 'failed' ? 'bg-red-400' :
-              'bg-gray-500'
+            <span className={`status-dot ${
+              activeExp.status === 'running' ? 'status-running animate-pulse-dot' :
+              activeExp.status === 'success' ? 'status-done' :
+              activeExp.status === 'failed' ? 'status-blocked' :
+              'status-idle'
             }`} />
-            <span className="text-gray-400 font-medium">実験 #{expCount}</span>
-            <span className="text-gray-500">{activeExp.status}</span>
+            <span className="text-[10px] text-zinc-500 font-mono">Exp #{expCount}</span>
+            <span className="text-[10px] text-zinc-600">{activeExp.status}</span>
           </div>
-          <p className="text-gray-300 line-clamp-2">{activeExp.hypothesis}</p>
-          <p className="text-gray-500">指標: {activeExp.metric}</p>
-          {activeExp.target_value && (
-            <p className="text-gray-500">目標: {activeExp.target_value}</p>
-          )}
+          <p className="text-[11px] text-zinc-400 leading-relaxed line-clamp-2">{activeExp.hypothesis}</p>
+          <div className="flex items-center gap-2 text-[10px] text-zinc-600">
+            <span>指標: {activeExp.metric}</span>
+            {activeExp.target_value && <span>目標: {activeExp.target_value}</span>}
+          </div>
         </div>
       )}
 
       {/* フッター */}
-      <div className="flex items-center justify-between mt-auto">
+      <div className="flex items-center justify-between mt-auto pt-1">
         <Link
           href={`/dashboard/startups/${startup.id}`}
-          className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
+          className="text-[11px] text-purple-400/80 hover:text-purple-300 transition-colors font-medium"
         >
           詳細 →
         </Link>
@@ -103,10 +104,10 @@ export default function StartupCard({ startup, experiments }: StartupCardProps) 
             href={siteUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1"
+            className="text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors flex items-center gap-1"
           >
-            <span>サイト</span>
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            サイト
+            <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
           </a>
