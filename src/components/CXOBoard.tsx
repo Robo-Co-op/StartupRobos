@@ -44,10 +44,10 @@ function CXOCard({ role, label, content, colorClass }: CXOCardProps) {
 }
 
 const CXO_CONFIG = [
-  { key: 'ctoReport' as const, role: 'CTO', label: '技術戦略', colorClass: 'border-blue-800 bg-blue-950/30' },
-  { key: 'cmoReport' as const, role: 'CMO', label: 'マーケティング戦略', colorClass: 'border-pink-800 bg-pink-950/30' },
-  { key: 'cooReport' as const, role: 'COO', label: 'オペレーション戦略', colorClass: 'border-orange-800 bg-orange-950/30' },
-  { key: 'cfoReport' as const, role: 'CFO', label: '財務戦略', colorClass: 'border-green-800 bg-green-950/30' },
+  { key: 'ctoReport' as const, role: 'CTO', label: 'Technology Strategy', colorClass: 'border-blue-800 bg-blue-950/30' },
+  { key: 'cmoReport' as const, role: 'CMO', label: 'Marketing Strategy', colorClass: 'border-pink-800 bg-pink-950/30' },
+  { key: 'cooReport' as const, role: 'COO', label: 'Operations Strategy', colorClass: 'border-orange-800 bg-orange-950/30' },
+  { key: 'cfoReport' as const, role: 'CFO', label: 'Finance Strategy', colorClass: 'border-green-800 bg-green-950/30' },
 ]
 
 interface CXOBoardProps {
@@ -73,11 +73,11 @@ export default function CXOBoard({ startupId }: CXOBoardProps) {
         body: JSON.stringify({ startupId, agenda }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'エラーが発生しました')
+      if (!res.ok) throw new Error(data.error ?? 'An error occurred')
       setSession(data)
       setAgenda('')
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'エラーが発生しました')
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setLoading(false)
     }
@@ -85,12 +85,12 @@ export default function CXOBoard({ startupId }: CXOBoardProps) {
 
   return (
     <div className="space-y-4">
-      {/* アジェンダ入力 */}
+      {/* Agenda Input */}
       <form onSubmit={handleRunCouncil} className="space-y-3">
         <textarea
           value={agenda}
           onChange={e => setAgenda(e.target.value)}
-          placeholder="CXO会議のアジェンダを入力...&#10;例: 競合他社が現れた。我々は価格を下げるべきか、機能で差別化すべきか？"
+          placeholder="Enter CXO meeting agenda...&#10;Example: A competitor has appeared. Should we lower prices or differentiate by features?"
           rows={3}
           maxLength={2000}
           required
@@ -105,10 +105,10 @@ export default function CXOBoard({ startupId }: CXOBoardProps) {
           {loading ? (
             <>
               <span className="animate-spin text-base">⟳</span>
-              CEO / CTO / CMO / COO / CFO 会議中...
+              CEO / CTO / CMO / COO / CFO meeting in progress...
             </>
           ) : (
-            '⚡ CXO会議を召集'
+            '⚡ Convene CXO Council'
           )}
         </button>
       </form>
@@ -119,14 +119,14 @@ export default function CXOBoard({ startupId }: CXOBoardProps) {
         </div>
       )}
 
-      {/* 会議結果 */}
+      {/* Meeting Results */}
       {session && (
         <div className="space-y-3">
           {/* CEO Decision (highlighted) */}
           <div className="border border-purple-700 bg-purple-950/40 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-xs font-mono font-bold text-purple-400">CEO</span>
-              <span className="text-sm font-semibold text-purple-300">戦略的意思決定</span>
+              <span className="text-sm font-semibold text-purple-300">Strategic Decision</span>
               <span className="ml-auto text-xs text-gray-500">${session.totalCostUsd.toFixed(4)}</span>
             </div>
             <p className="text-sm text-gray-200 whitespace-pre-wrap">{session.ceoDecision}</p>
@@ -146,7 +146,7 @@ export default function CXOBoard({ startupId }: CXOBoardProps) {
           </div>
 
           <p className="text-xs text-gray-600 text-right">
-            残予算: ${session.budgetRemaining.toFixed(4)}
+            Remaining Budget: ${session.budgetRemaining.toFixed(4)}
           </p>
         </div>
       )}

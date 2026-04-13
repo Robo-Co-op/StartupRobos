@@ -4,7 +4,7 @@ import { createServiceClient } from '@/lib/supabase/client'
 import { maskPII } from '@/lib/security/piiMasker'
 import { z } from 'zod'
 
-// レート制限用メモリキャッシュ (本番では Redis 推奨)
+// Rate limiting memory cache (Redis recommended for production)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 
 function checkRateLimit(userId: string): boolean {
@@ -28,23 +28,23 @@ const requestSchema = z.object({
 
 // TODO: Add API key auth for Mission Control
 export async function POST(req: NextRequest) {
-  // レート制限チェック (10リクエスト/分) — using IP-based limiting for now
+  // Rate limit check (10 requests/min) — using IP-based limiting for now
   const ip = req.headers.get('x-forwarded-for') || 'unknown'
   if (!checkRateLimit(ip)) {
-    return NextResponse.json({ error: 'リクエスト制限を超えました。1分後に再試行してください' }, { status: 429 })
+    return NextResponse.json({ error: 'Rate limit exceeded. Please retry after 1 minute.' }, { status: 429 })
   }
 
   const body = await req.json()
   const parsed = requestSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: '入力値が無効です', details: parsed.error.issues }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid input values', details: parsed.error.issues }, { status: 400 })
   }
 
   const { startupId, taskType, prompt } = parsed.data
 
   const supabaseService = createServiceClient()
 
-  // スタートアップ確認
+  // Verify startup exists
   const { data: startup } = await supabaseService
     .from('startups')
     .select('id, user_id')
@@ -52,10 +52,10 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (!startup) {
-    return NextResponse.json({ error: 'スタートアップが見つかりません' }, { status: 404 })
+    return NextResponse.json({ error: 'Startup not found' }, { status: 404 })
   }
 
-  // PII マスク処理
+  // PII masking
   const sanitizedPrompt = maskPII(prompt)
   // TODO: Add user context via API key auth
   const config: AgentConfig = { userId: startup.user_id ?? 'anonymous', startupId, taskType }
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     const result = await runAgent(config, sanitizedPrompt, supabaseService)
     return NextResponse.json(result)
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : '予期せぬエラーが発生しました'
+    const message = err instanceof Error ? err.message : 'An unexpected error occurred'
     return NextResponse.json({ error: message }, { status: 400 })
   }
 }

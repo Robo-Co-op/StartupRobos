@@ -4,7 +4,7 @@ import { createServiceClient } from '@/lib/supabase/client'
 import { maskPII } from '@/lib/security/piiMasker'
 import { runCouncil } from '@/lib/agent/council'
 
-// レート制限: CXO会議は重いので 3回/分/ユーザー
+// Rate limiting: CXO meetings are resource-heavy so limit to 3 calls/min/user
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 
 function checkRateLimit(userId: string): boolean {
@@ -26,22 +26,22 @@ const requestSchema = z.object({
 
 // TODO: Add API key auth for Mission Control
 export async function POST(req: NextRequest) {
-  // レート制限チェック (3回/分) — using IP-based limiting for now
+  // Rate limit check (3 calls/min) — using IP-based limiting for now
   const ip = req.headers.get('x-forwarded-for') || 'unknown'
   if (!checkRateLimit(ip)) {
-    return NextResponse.json({ error: 'CXO会議は1分間に3回までです' }, { status: 429 })
+    return NextResponse.json({ error: 'CXO meetings limited to 3 per minute' }, { status: 429 })
   }
 
   const body = await req.json()
   const parsed = requestSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: '入力値が無効です', details: parsed.error.issues }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid input values', details: parsed.error.issues }, { status: 400 })
   }
 
   const { startupId, agenda } = parsed.data
   const supabaseService = createServiceClient()
 
-  // スタートアップ取得 + コンテキスト
+  // Fetch startup + context
   const { data: startup } = await supabaseService
     .from('startups')
     .select('id, user_id, name, description, status, pivot_count')
@@ -49,14 +49,14 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (!startup) {
-    return NextResponse.json({ error: 'スタートアップが見つかりません' }, { status: 404 })
+    return NextResponse.json({ error: 'Startup not found' }, { status: 404 })
   }
 
   const startupContext = [
-    `会社名: ${startup.name}`,
-    startup.description ? `説明: ${startup.description}` : '',
-    `ステータス: ${startup.status}`,
-    `ピボット数: ${startup.pivot_count} / 30`,
+    `Company: ${startup.name}`,
+    startup.description ? `Description: ${startup.description}` : '',
+    `Status: ${startup.status}`,
+    `Pivots: ${startup.pivot_count} / 30`,
   ].filter(Boolean).join('\n')
 
   const sanitizedAgenda = maskPII(agenda)
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     )
     return NextResponse.json(result)
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'CXO会議でエラーが発生しました'
+    const message = err instanceof Error ? err.message : 'An error occurred during the CXO meeting'
     return NextResponse.json({ error: message }, { status: 400 })
   }
 }

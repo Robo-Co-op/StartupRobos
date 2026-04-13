@@ -5,12 +5,12 @@ const AGENT_CONFIG: Record<string, { label: string; color: string; icon: string 
 }
 
 const TASK_LABELS: Record<string, string> = {
-  pivot_analysis: 'ピボット分析',
-  market_research: '市場調査',
-  mvp_spec: 'MVP仕様',
-  pivot_decision: 'ピボット判断',
-  budget_review: '予算レビュー',
-  ops_review: 'Ops レビュー',
+  pivot_analysis: 'Pivot Analysis',
+  market_research: 'Market Research',
+  mvp_spec: 'MVP Specification',
+  pivot_decision: 'Pivot Decision',
+  budget_review: 'Budget Review',
+  ops_review: 'Operations Review',
 }
 
 interface AgentRun {
@@ -46,8 +46,8 @@ export default function AgentActivityFeed({ runs, startupNames }: AgentActivityF
           <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
             <span className="text-zinc-600 text-sm">~</span>
           </div>
-          <p className="text-[12px] text-zinc-600">CXOチーム待機中</p>
-          <p className="text-[10px] text-zinc-700">実行ログがここに表示されます</p>
+          <p className="text-[12px] text-zinc-600">CXO team on standby</p>
+          <p className="text-[10px] text-zinc-700">Execution logs will appear here</p>
         </div>
       </div>
     )
@@ -68,7 +68,7 @@ export default function AgentActivityFeed({ runs, startupNames }: AgentActivityF
                 opacity: Math.max(0.3, 1 - i * 0.06),
               }}
             >
-              {/* タイムラインドット */}
+              {/* Timeline dot */}
               <div className="relative mt-1.5">
                 <div
                   className="w-[7px] h-[7px] rounded-full"
@@ -76,7 +76,7 @@ export default function AgentActivityFeed({ runs, startupNames }: AgentActivityF
                 />
               </div>
 
-              {/* コンテンツ */}
+              {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span
@@ -86,7 +86,7 @@ export default function AgentActivityFeed({ runs, startupNames }: AgentActivityF
                     {agent.label}
                   </span>
                   <span className="text-[10px] text-zinc-600">
-                    {run.task_type ? (TASK_LABELS[run.task_type] ?? run.task_type.replace(/_/g, ' ')) : 'タスク'}
+                    {run.task_type ? (TASK_LABELS[run.task_type] ?? run.task_type.replace(/_/g, ' ')) : 'Task'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
@@ -98,7 +98,7 @@ export default function AgentActivityFeed({ runs, startupNames }: AgentActivityF
                 </div>
               </div>
 
-              {/* 右: 時間 + コスト */}
+              {/* Right: Time + Cost */}
               <div className="text-right shrink-0">
                 <span className="text-[10px] text-zinc-700 font-mono">{timeAgo(run.created_at)}</span>
                 {run.cost_usd != null && run.cost_usd > 0 && (

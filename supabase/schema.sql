@@ -1,7 +1,7 @@
--- Launchpad データベーススキーマ
--- Supabase SQL エディタで実行してください
+-- Launchpad Database Schema
+-- Execute in Supabase SQL Editor
 
--- ユーザープロフィール
+-- User Profiles
 create table profiles (
   id uuid references auth.users primary key,
   full_name text,
@@ -16,21 +16,21 @@ create table profiles (
   created_at timestamptz default now()
 );
 
--- スタートアップ (ユーザーあたり最大3社)
+-- Startups (Max 3 per user)
 create table startups (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
   name text not null,
   description text,
   status text default 'active' check (status in ('active', 'pivoted', 'paused', 'graduated')),
-  pivot_count int default 0, -- legacy: kept for backwards compatibility
+  pivot_count int default 0, -- Legacy: kept for backwards compatibility
   business_type text,
   experiment_count int default 0,
   max_experiments int default 10,
   created_at timestamptz default now()
 );
 
--- ピボットログ (追記専用)
+-- Pivot Log (Append-only)
 create table pivot_log (
   id uuid primary key default gen_random_uuid(),
   startup_id uuid references startups(id) on delete cascade,
@@ -41,7 +41,7 @@ create table pivot_log (
   created_at timestamptz default now()
 );
 
--- エージェント実行ログ
+-- Agent Run Log
 create table agent_runs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id),
@@ -55,7 +55,7 @@ create table agent_runs (
   created_at timestamptz default now()
 );
 
--- 実験
+-- Experiments
 create table experiments (
   id uuid primary key default gen_random_uuid(),
   startup_id uuid references startups(id) on delete cascade,
@@ -69,7 +69,7 @@ create table experiments (
   created_at timestamptz default now()
 );
 
--- トークン予算
+-- Token Budget
 create table token_budgets (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) unique,
@@ -79,7 +79,7 @@ create table token_budgets (
   updated_at timestamptz default now()
 );
 
--- Stripe サブスクリプション
+-- Stripe Subscriptions
 -- Legacy: kept for future web app
 create table subscriptions (
   id uuid primary key default gen_random_uuid(),
@@ -92,7 +92,7 @@ create table subscriptions (
   created_at timestamptz default now()
 );
 
--- RLS を有効化
+-- Enable RLS
 alter table profiles enable row level security;
 alter table startups enable row level security;
 alter table pivot_log enable row level security;
@@ -101,7 +101,7 @@ alter table token_budgets enable row level security;
 alter table subscriptions enable row level security;
 alter table experiments enable row level security;
 
--- RLS ポリシー
+-- RLS Policies
 create policy "Users own their profile" on profiles
   for all using (auth.uid() = id);
 
@@ -130,7 +130,7 @@ create policy "Users see their subscription" on subscriptions
 create policy "Users see own experiments" on experiments
   for all using (auth.uid() = (select user_id from startups where id = startup_id));
 
--- インデックス
+-- Indexes
 create index idx_startups_user_id on startups(user_id);
 create index idx_agent_runs_user_id on agent_runs(user_id);
 create index idx_experiments_startup_id on experiments(startup_id);

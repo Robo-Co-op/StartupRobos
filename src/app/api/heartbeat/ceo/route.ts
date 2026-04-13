@@ -5,7 +5,7 @@ import { sendReport } from '@/lib/notify'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
-// Vercel Cron は Authorization: Bearer {CRON_SECRET} を送ってくる
+// Vercel Cron sends Authorization: Bearer {CRON_SECRET}
 function isAuthorized(req: NextRequest) {
   const auth = req.headers.get('authorization')
   return auth === `Bearer ${process.env.CRON_SECRET}`
@@ -18,14 +18,14 @@ export async function GET(req: NextRequest) {
 
   const supabase = createServiceClient()
 
-  // アクティブなスタートアップと直近の実験を取得
+  // Fetch active startups and recent experiments
   const { data: startups } = await supabase
     .from('startups')
     .select('id, name, business_type, status')
     .eq('status', 'active')
 
   if (!startups?.length) {
-    return NextResponse.json({ message: 'スタートアップなし' })
+    return NextResponse.json({ message: 'No startups found' })
   }
 
   const { data: experiments } = await supabase
@@ -34,36 +34,36 @@ export async function GET(req: NextRequest) {
     .in('startup_id', startups.map(s => s.id))
     .order('created_at', { ascending: false })
 
-  // CEO向けコンテキスト構築
+  // Build CEO context for analysis
   const context = startups.map(s => {
     const exps = (experiments ?? []).filter(e => e.startup_id === s.id)
     const recent = exps.slice(0, 3).map(e => `- ${e.hypothesis} [${e.status}]`).join('\n')
-    return `## ${s.name} (${s.business_type})\n直近の実験:\n${recent || 'なし'}`
+    return `## ${s.name} (${s.business_type})\nRecent experiments:\n${recent || 'none'}`
   }).join('\n\n')
 
-  const prompt = `あなたはLaunchpadのCEOです。以下の3つのスタートアップの状況を評価し、各事業の次のアクションを1つずつ日本語で提案してください。
+  const prompt = `You are the CEO of Launchpad. Evaluate the status of the following startups and propose the next action for each business:
 
 ${context}
 
-各事業について:
-1. 現状の課題（1行）
-2. 次に試すべき実験（具体的に）
-3. 優先度（High/Medium/Low）`
+For each business:
+1. Current challenges (1 line)
+2. Next experiment to try (specific details)
+3. Priority (High/Medium/Low)`
 
   const start = Date.now()
   const response = await anthropic.messages.create({
     model: 'claude-opus-4-6',
     max_tokens: 1500,
     messages: [{ role: 'user', content: prompt }],
-    system: 'あなたは経験豊富なスタートアップCEOです。データに基づいて簡潔・具体的に判断します。',
+    system: 'You are an experienced startup CEO. Make concise and specific decisions based on data.',
   })
 
   const content = response.content[0].type === 'text' ? response.content[0].text : ''
   const costUsd = (response.usage.input_tokens / 1_000_000 * 15.0) + (response.usage.output_tokens / 1_000_000 * 75.0)
 
-  // 実行ログをSupabaseに保存
+  // Save execution log to Supabase
   await supabase.from('agent_runs').insert({
-    startup_id: startups[0].id, // CEO は全体担当なので代表1件
+    startup_id: startups[0].id, // CEO handles overall, using representative entry
     model: 'claude-opus-4-6',
     tokens_input: response.usage.input_tokens,
     tokens_output: response.usage.output_tokens,
@@ -72,11 +72,11 @@ ${context}
     result: content,
   })
 
-  // メール通知
+  // Send email notification
   const hour = new Date().getUTCHours()
-  const period = hour < 6 ? '朝' : '夕方'
+  const period = hour < 6 ? 'Morning' : 'Evening'
   await sendReport(
-    `📊 Launchpad ${period}レポート — ${new Date().toLocaleDateString('ja-JP')}`,
+    `📊 Launchpad ${period} Report — ${new Date().toLocaleDateString('en-US')}`,
     content
   )
 

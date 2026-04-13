@@ -5,7 +5,7 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
-// コストモデルごとのトークン単価 (USD / 100万トークン)
+// Token costs per model (USD / 1 million tokens)
 const TOKEN_COSTS = {
   'claude-haiku-4-5-20251001': { input: 1.00, output: 5.00 },
   'claude-sonnet-4-6': { input: 3.00, output: 15.00 },
@@ -35,24 +35,24 @@ export async function runAgent(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabaseServiceClient: SupabaseClient<any, any, any>
 ): Promise<AgentResult> {
-  // pivot_decision は sonnet、それ以外は haiku を使用
+  // Use sonnet for pivot_decision, haiku for others
   const model: ModelName = config.model ?? (
     config.taskType === 'pivot_decision' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
   )
   const maxTokens = config.maxTokens ?? 1000
 
-  // 実行前に予算チェック
+  // Check budget before execution
   const { data: budget, error: budgetError } = await supabaseServiceClient
     .from('token_budgets')
     .select('spent_usd, total_usd')
     .eq('user_id', config.userId)
     .single()
 
-  if (budgetError || !budget) throw new Error('予算情報が見つかりません')
+  if (budgetError || !budget) throw new Error('Budget information not found')
   const remainingUsd = Number(budget.total_usd) - Number(budget.spent_usd)
-  if (remainingUsd <= 0) throw new Error('トークン予算を使い切りました')
+  if (remainingUsd <= 0) throw new Error('Token budget exhausted')
 
-  // エージェント実行
+  // Execute agent
   const response = await anthropic.messages.create({
     model,
     max_tokens: maxTokens,
@@ -65,7 +65,7 @@ export async function runAgent(
   const costs = TOKEN_COSTS[model]
   const costUsd = (tokensIn / 1_000_000 * costs.input) + (tokensOut / 1_000_000 * costs.output)
 
-  // 実行記録を保存
+  // Save execution record
   await supabaseServiceClient.from('agent_runs').insert({
     user_id: config.userId,
     startup_id: config.startupId,
@@ -76,7 +76,7 @@ export async function runAgent(
     task_type: config.taskType,
   })
 
-  // 予算を更新
+  // Update budget
   await supabaseServiceClient
     .from('token_budgets')
     .update({

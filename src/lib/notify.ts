@@ -1,14 +1,14 @@
-// メール通知ユーティリティ（Resend API）
+// Email notification utility (Resend API)
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL || 'jintkim@roboco-op.org'
 
 export async function sendReport(subject: string, body: string) {
   if (!RESEND_API_KEY) {
-    console.warn('RESEND_API_KEY 未設定 — メール通知スキップ')
+    console.warn('RESEND_API_KEY not configured — skipping email notification')
     return
   }
 
-  // マークダウンをHTML変換（簡易）
+  // Convert markdown to HTML (simple)
   const html = body
     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
@@ -32,13 +32,13 @@ export async function sendReport(subject: string, body: string) {
         </div>
         ${html}
         <div style="border-top: 1px solid #333; margin-top: 20px; padding-top: 12px; font-size: 12px; color: #666;">
-          <a href="https://launchpad-kohl-three.vercel.app/dashboard" style="color: #a78bfa;">Mission Control で詳細を確認</a>
+          <a href="https://launchpad-kohl-three.vercel.app/dashboard" style="color: #a78bfa;">View details in Mission Control</a>
         </div>
       </div>`,
     }),
   })
 
   if (!res.ok) {
-    console.error('メール送信失敗:', await res.text())
+    console.error('Email send failed:', await res.text())
   }
 }

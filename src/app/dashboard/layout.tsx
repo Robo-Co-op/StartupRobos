@@ -29,9 +29,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen bg-[#09090b] text-white">
-      {/* サイドバー */}
+      {/* Sidebar */}
       <aside className="w-60 shrink-0 border-r border-[#1c1c22] flex flex-col bg-[#09090b]">
-        {/* ロゴ */}
+        {/* Logo */}
         <div className="px-5 py-4 border-b border-[#1c1c22]">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-sm font-bold shadow-lg shadow-purple-900/30">
@@ -44,7 +44,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
 
-        {/* ナビゲーション */}
+        {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
           {/* Overview */}
           <div>
@@ -144,7 +144,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </nav>
 
-        {/* フッター */}
+        {/* Footer */}
         <div className="px-4 py-3 border-t border-[#1c1c22]">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse-dot" />
@@ -153,7 +153,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      {/* メインコンテンツ */}
+      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 bg-[#09090b]">
         {children}
       </div>
@@ -161,7 +161,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   )
 }
 
-// SVG アイコンコンポーネント
+// SVG icon components
 function DashboardIcon({ active }: { active: boolean }) {
   return (
     <svg className={`w-4 h-4 ${active ? 'text-purple-400' : 'text-zinc-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

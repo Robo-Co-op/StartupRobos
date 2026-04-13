@@ -9,55 +9,55 @@ function isAuthorized(req: NextRequest) {
   return auth === `Bearer ${process.env.CRON_SECRET}`
 }
 
-// 事業タイプ別のCXOタスク（CMO + CTO）
+// Business-specific CXO tasks (CMO + CTO)
 const BUSINESS_TASKS: Record<string, { role: string; prompt: string; task_type: string }> = {
   affiliate_seo: {
     role: 'CMO',
     task_type: 'market_research',
-    prompt: `あなたはSEO専門のCMOです。AI Tool Lab（日本語AIツール紹介サイト）の集客改善案を3つ提案してください。
-キーワード戦略・記事タイトル案・内部リンク改善など具体的に。各提案は2-3行で。`,
+    prompt: `You are an SEO-specialist CMO. Propose 3 ideas to improve customer acquisition for AI Tool Lab (AI tools directory site).
+Be specific with keyword strategies, article title suggestions, and internal linking improvements. Keep each proposal to 2-3 lines.`,
   },
   digital_product: {
     role: 'CMO',
     task_type: 'market_research',
-    prompt: `あなたはデジタル商品専門のCMOです。Prompt Pack（Claude/ChatGPT用プロンプト集、Gumroad販売）の
-販売促進案を3つ提案してください。SNS戦略・LP改善・価格設定など。各提案は2-3行で。`,
+    prompt: `You are a digital product CMO. Propose 3 sales promotion ideas for Prompt Pack (Claude/ChatGPT prompt collection sold on Gumroad).
+Consider social strategies, landing page improvements, and pricing. Keep each proposal to 2-3 lines.`,
   },
   game_ads: {
     role: 'CTO',
     task_type: 'mvp_spec',
-    prompt: `あなたはゲーム開発CTOです。Puzzle Games（数独・ひらがなマッチ、AdSense収益）の
-エンゲージメント改善案を3つ提案してください。ゲーム機能追加・UX改善・SEO対策など。各提案は2-3行で。`,
+    prompt: `You are a game development CTO. Propose 3 engagement improvement ideas for Puzzle Games (Sudoku and hiragana matching games with AdSense revenue).
+Consider feature additions, UX improvements, and SEO optimization. Keep each proposal to 2-3 lines.`,
   },
 }
 
-// 横断CXOタスク（COO + CFO）— 全事業共通
+// Cross-functional CXO tasks (COO + CFO) — common across all businesses
 const CROSS_CXO_TASKS = [
   {
     role: 'COO',
     task_type: 'ops_review',
-    prompt: `あなたはLaunchpadのCOO（最高執行責任者）です。以下の3事業の運用状況をレビューしてください:
+    prompt: `You are the COO (Chief Operating Officer) of Launchpad. Review the operations of these 3 businesses:
 - AI Tool Lab (GitHub Pages, affiliate_seo)
 - Prompt Pack (GitHub Pages + Gumroad, digital_product)
 - Puzzle Games (GitHub Pages + AdSense, game_ads)
 
-以下を日本語で報告:
-1. デプロイ・ホスティングの課題（あれば）
-2. 監視・アラートの改善提案
-3. 次にやるべき運用タスク1つ`,
+Report on:
+1. Any deployment or hosting challenges
+2. Monitoring and alerting improvement suggestions
+3. One critical operations task to do next`,
   },
   {
     role: 'CFO',
     task_type: 'budget_review',
-    prompt: `あなたはLaunchpadのCFO（最高財務責任者）です。以下の3事業の収益化状況をレビューしてください:
+    prompt: `You are the CFO (Chief Financial Officer) of Launchpad. Review the monetization status of these 3 businesses:
 - AI Tool Lab: Amazon Associates (tag=robocoop-ai-22)
-- Prompt Pack: Gumroad販売 ($9/$7/$12の3商品)
-- Puzzle Games: Google AdSense (審査待ち)
+- Prompt Pack: Gumroad sales (3 products at $9/$7/$12)
+- Puzzle Games: Google AdSense (pending approval)
 
-以下を日本語で報告:
-1. 各チャネルの期待収益見込み（月額）
-2. コスト構造（APIコスト、ホスティング）
-3. 収益改善のための提案1つ`,
+Report on:
+1. Expected monthly revenue per channel
+2. Cost structure (API costs, hosting)
+3. One proposal to improve revenue`,
   },
 ]
 
@@ -74,13 +74,13 @@ export async function GET(req: NextRequest) {
     .eq('status', 'active')
 
   if (!startups?.length) {
-    return NextResponse.json({ message: 'スタートアップなし' })
+    return NextResponse.json({ message: 'No startups found' })
   }
 
   const results = []
   let totalCost = 0
 
-  // 事業別タスク（CMO / CTO）
+  // Business-specific tasks (CMO / CTO)
   for (const startup of startups) {
     const task = BUSINESS_TASKS[startup.business_type]
     if (!task) continue
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
       model: 'claude-sonnet-4-6',
       max_tokens: 800,
       messages: [{ role: 'user', content: task.prompt }],
-      system: `あなたはLaunchpadの${task.role}です。実行可能で具体的な提案を日本語で行います。`,
+      system: `You are the ${task.role} of Launchpad. Provide actionable and specific recommendations.`,
     })
 
     const content = response.content[0].type === 'text' ? response.content[0].text : ''
@@ -109,20 +109,20 @@ export async function GET(req: NextRequest) {
     results.push({ startup: startup.name, role: task.role, suggestions: content })
   }
 
-  // 横断タスク（COO / CFO）
+  // Cross-functional tasks (COO / CFO)
   for (const task of CROSS_CXO_TASKS) {
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 800,
       messages: [{ role: 'user', content: task.prompt }],
-      system: `あなたはLaunchpadの${task.role}です。実行可能で具体的な提案を日本語で行います。`,
+      system: `You are the ${task.role} of Launchpad. Provide actionable and specific recommendations.`,
     })
 
     const content = response.content[0].type === 'text' ? response.content[0].text : ''
     const costUsd = (response.usage.input_tokens / 1_000_000 * 3.0) + (response.usage.output_tokens / 1_000_000 * 15.0)
     totalCost += costUsd
 
-    // COO/CFOは全体担当なので代表startup_idを使用
+    // COO/CFO handle overall responsibilities using representative startup_id
     await supabase.from('agent_runs').insert({
       startup_id: startups[0].id,
       model: 'claude-sonnet-4-6',

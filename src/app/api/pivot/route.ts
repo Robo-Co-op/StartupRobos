@@ -15,7 +15,7 @@ const requestSchema = z.object({
 export async function POST(req: NextRequest) {
   const body = await req.json()
   const parsed = requestSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: '入力値が無効です' }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: 'Invalid input values' }, { status: 400 })
 
   const { startupId, agentSuggestion, pivotFrom, pivotTo, reason } = parsed.data
   const supabaseService = createServiceClient()
@@ -26,12 +26,12 @@ export async function POST(req: NextRequest) {
     .eq('id', startupId)
     .single()
 
-  if (!startup) return NextResponse.json({ error: 'スタートアップが見つかりません' }, { status: 404 })
+  if (!startup) return NextResponse.json({ error: 'Startup not found' }, { status: 404 })
 
   await supabaseService.from('pivot_log').insert({
     startup_id: startupId,
-    pivot_from: pivotFrom ?? '現在のモデル',
-    pivot_to: pivotTo ?? 'AIが提案するモデル',
+    pivot_from: pivotFrom ?? 'Current Model',
+    pivot_to: pivotTo ?? 'AI-Suggested Model',
     reason,
     agent_suggestion: agentSuggestion,
   })

@@ -48,7 +48,7 @@ export default function StartupCard({ startup, experiments }: StartupCardProps) 
 
   return (
     <div className="card p-4 flex flex-col gap-3 group">
-      {/* ヘッダー */}
+      {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <h3 className="text-[13px] font-semibold text-zinc-200 truncate group-hover:text-white transition-colors">
@@ -70,7 +70,7 @@ export default function StartupCard({ startup, experiments }: StartupCardProps) 
         </span>
       </div>
 
-      {/* 実験 */}
+      {/* Experiments */}
       {activeExp && (
         <div className="bg-zinc-900/50 border border-[#1c1c22] rounded-lg p-3 space-y-1.5">
           <div className="flex items-center gap-1.5">
@@ -85,19 +85,19 @@ export default function StartupCard({ startup, experiments }: StartupCardProps) 
           </div>
           <p className="text-[11px] text-zinc-400 leading-relaxed line-clamp-2">{activeExp.hypothesis}</p>
           <div className="flex items-center gap-2 text-[10px] text-zinc-600">
-            <span>指標: {activeExp.metric}</span>
-            {activeExp.target_value && <span>目標: {activeExp.target_value}</span>}
+            <span>Metric: {activeExp.metric}</span>
+            {activeExp.target_value && <span>Target: {activeExp.target_value}</span>}
           </div>
         </div>
       )}
 
-      {/* フッター */}
+      {/* Footer */}
       <div className="flex items-center justify-between mt-auto pt-1">
         <Link
           href={`/dashboard/startups/${startup.id}`}
           className="text-[11px] text-purple-400/80 hover:text-purple-300 transition-colors font-medium"
         >
-          詳細 →
+          Details →
         </Link>
         {siteUrl && (
           <a
@@ -106,7 +106,7 @@ export default function StartupCard({ startup, experiments }: StartupCardProps) 
             rel="noopener noreferrer"
             className="text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors flex items-center gap-1"
           >
-            サイト
+            Site
             <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>

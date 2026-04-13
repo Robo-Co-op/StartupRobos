@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
-// クライアントサイド用 (anon key)
+// Client-side (anon key)
 export function getSupabaseClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -8,7 +8,7 @@ export function getSupabaseClient() {
   )
 }
 
-// サーバーサイド専用 (service role key — クライアントに絶対に露出しない)
+// Server-side only (service role key — never expose to client)
 export function createServiceClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

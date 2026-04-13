@@ -8,7 +8,7 @@ interface StartupPivot {
 
 interface PivotCounterProps {
   startups: StartupPivot[]
-  startDate: string // ISO日付
+  startDate: string // ISO date format
 }
 
 const MAX_PIVOTS = 30
@@ -23,10 +23,10 @@ export default function PivotCounter({ startups, startDate }: PivotCounterProps)
 
   return (
     <div className="space-y-4">
-      {/* 30マスグリッド */}
+      {/* 30-grid layout */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-300">実験進捗</span>
+          <span className="text-sm font-medium text-gray-300">Experiment Progress</span>
           <span className="text-sm text-gray-400">{totalPivots} / {MAX_PIVOTS}</span>
         </div>
         <div className="grid grid-cols-10 gap-1">
@@ -38,21 +38,21 @@ export default function PivotCounter({ startups, startDate }: PivotCounterProps)
                   ? 'bg-purple-500'
                   : 'bg-gray-700'
               }`}
-              title={`実験 ${i + 1}`}
+              title={`Experiment ${i + 1}`}
             />
           ))}
         </div>
       </div>
 
-      {/* 日数カウントダウン */}
+      {/* Days Countdown */}
       <div className="flex items-center justify-between text-sm">
-        <span className="text-gray-400">残り日数</span>
+        <span className="text-gray-400">Days Remaining</span>
         <span className={`font-bold ${daysRemaining <= 7 ? 'text-red-400' : 'text-green-400'}`}>
-          {daysRemaining} 日
+          {daysRemaining} days
         </span>
       </div>
 
-      {/* スタートアップ別内訳 */}
+      {/* Startup Breakdown */}
       <div className="space-y-2">
         {startups.map((startup) => (
           <div key={startup.id} className="flex items-center justify-between">

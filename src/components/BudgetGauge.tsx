@@ -10,7 +10,7 @@ export default function BudgetGauge({ spentUsd, totalUsd }: BudgetGaugeProps) {
   const pct = Math.min(100, (spentUsd / totalUsd) * 100)
   const remainingPct = 100 - pct
 
-  // 残量に応じた色
+  // Color based on remaining amount
   const color =
     remainingPct > 50 ? 'text-green-400' :
     remainingPct > 20 ? 'text-yellow-400' :
@@ -21,12 +21,12 @@ export default function BudgetGauge({ spentUsd, totalUsd }: BudgetGaugeProps) {
     remainingPct > 20 ? '#facc15' :
     '#f87171'
 
-  // SVG 円形プログレス
+  // SVG circular progress
   const radius = 54
   const circumference = 2 * Math.PI * radius
   const offset = circumference * (pct / 100)
 
-  // Haiku トークン換算 (input $1/1M, output $5/1M — 平均 ~$2/1M)
+  // Haiku token conversion (input $1/1M, output $5/1M — average ~$2/1M)
   const haikuTokensLeft = Math.floor((remaining / 2) * 1_000_000)
   const haikuK = Math.round(haikuTokensLeft / 1000)
 
@@ -34,9 +34,9 @@ export default function BudgetGauge({ spentUsd, totalUsd }: BudgetGaugeProps) {
     <div className="flex flex-col items-center gap-3">
       <div className="relative w-32 h-32">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 128 128">
-          {/* 背景トラック */}
+          {/* Background track */}
           <circle cx="64" cy="64" r={radius} fill="none" stroke="#374151" strokeWidth="10" />
-          {/* 消費済みアーク */}
+          {/* Consumed arc */}
           <circle
             cx="64" cy="64" r={radius}
             fill="none"
@@ -48,16 +48,16 @@ export default function BudgetGauge({ spentUsd, totalUsd }: BudgetGaugeProps) {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className={`text-xl font-bold ${color}`}>${remaining.toFixed(2)}</span>
-          <span className="text-xs text-gray-400">残り</span>
+          <span className="text-xs text-gray-400">Remaining</span>
         </div>
       </div>
 
       <div className="text-center">
         <p className="text-sm text-gray-300">
-          <span className={color}>~{haikuK}k トークン</span> 残り (Haiku)
+          <span className={color}>~{haikuK}k tokens</span> remaining (Haiku)
         </p>
         <p className="text-xs text-gray-500 mt-1">
-          ${spentUsd.toFixed(4)} / ${totalUsd.toFixed(2)} 使用
+          ${spentUsd.toFixed(4)} / ${totalUsd.toFixed(2)} spent
         </p>
       </div>
     </div>

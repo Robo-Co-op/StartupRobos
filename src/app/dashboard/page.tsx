@@ -54,11 +54,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col min-h-0 overflow-auto">
-      {/* ヘッダー */}
+      {/* Header */}
       <div className="px-6 py-4 border-b border-[#1c1c22] flex items-center justify-between shrink-0">
         <div>
           <h1 className="text-[15px] font-semibold tracking-tight">Dashboard</h1>
-          <p className="text-[11px] text-zinc-600 mt-0.5">ビジネス3つの自律運営状況</p>
+          <p className="text-[11px] text-zinc-600 mt-0.5">Autonomous operations of 3 businesses</p>
         </div>
         <div className="flex items-center gap-3 text-[11px] text-zinc-600">
           <span className="flex items-center gap-1.5">
@@ -66,13 +66,13 @@ export default async function DashboardPage() {
             System Active
           </span>
           <span className="text-zinc-700">|</span>
-          <span>{new Date().toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })} {new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo' })}</span>
+          <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })}</span>
         </div>
       </div>
 
       <div className="flex-1 px-6 py-5 space-y-5">
 
-        {/* KPIカード */}
+        {/* KPI Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <KPICard
             label="Experiments"
@@ -102,7 +102,7 @@ export default async function DashboardPage() {
           />
         </div>
 
-        {/* エージェント作業 */}
+        {/* Agent Work */}
         <section>
           <SectionHeader title="Recent Agent Work" count={recentAgentWork.length} />
           {recentAgentWork.length > 0 ? (
@@ -126,10 +126,10 @@ export default async function DashboardPage() {
                         <span className="text-[12px] font-medium text-zinc-300">{agent.label}</span>
                       </div>
                       <span className="text-[10px] text-zinc-700 font-mono">
-                        {new Date(run.created_at).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(run.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
-                    <p className="text-[11px] text-zinc-500 leading-relaxed">{run.task_type?.replace(/_/g, ' ') ?? 'タスク実行'}</p>
+                    <p className="text-[11px] text-zinc-500 leading-relaxed">{run.task_type?.replace(/_/g, ' ') ?? 'Task execution'}</p>
                     {run.cost_usd > 0 && (
                       <p className="text-[10px] text-zinc-700 mt-1 font-mono">${Number(run.cost_usd).toFixed(4)}</p>
                     )}
@@ -161,12 +161,12 @@ export default async function DashboardPage() {
           )}
         </section>
 
-        {/* スタートアップ */}
+        {/* Startups */}
         <section>
           <SectionHeader title="Startups" detail={`${experiments.length} experiments total`} />
           {startups.length === 0 ? (
             <div className="card border-dashed p-10 text-center">
-              <p className="text-zinc-600 text-[13px]">CCでオンボーディングを完了すると事業が表示されます</p>
+              <p className="text-zinc-600 text-[13px]">Businesses appear after onboarding in the agent console</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-3">
@@ -181,15 +181,15 @@ export default async function DashboardPage() {
           )}
         </section>
 
-        {/* 下段: 実験トラッカー + アクティビティ */}
+        {/* Bottom: Experiment Tracker + Activity */}
         <div className="grid md:grid-cols-5 gap-3">
-          {/* 実験トラッカー */}
+          {/* Experiment Tracker */}
           <div className="md:col-span-3 card p-5">
             <div className="flex items-center justify-between mb-4">
               <p className="text-[11px] text-zinc-500 font-semibold uppercase tracking-[0.08em]">Experiment Tracker</p>
               <span className="text-[11px] text-zinc-600 font-mono">{successExps} / 30</span>
             </div>
-            {/* 30マスグリッド */}
+            {/* 30-grid layout */}
             <div className="grid grid-cols-10 gap-1.5 mb-4">
               {Array.from({ length: 30 }).map((_, i) => {
                 const exp = experiments[i]
@@ -207,14 +207,14 @@ export default async function DashboardPage() {
                 )
               })}
             </div>
-            {/* 凡例 */}
+            {/* Legend */}
             <div className="flex gap-4 text-[10px] text-zinc-600 mb-3">
               <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-sm bg-purple-500/80" />Running</span>
               <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-sm bg-green-500/80" />Success</span>
               <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-sm bg-red-500/40" />Failed</span>
               <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-sm bg-zinc-800/60" />Pending</span>
             </div>
-            {/* 事業別プログレス */}
+            {/* Business Progress */}
             <div className="space-y-2 border-t border-[#1c1c22] pt-3">
               {startups.map((s: any) => {
                 const exps = experiments.filter((e: any) => e.startup_id === s.id)
@@ -241,7 +241,7 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          {/* アクティビティフィード */}
+          {/* Activity Feed */}
           <div className="md:col-span-2">
             <AgentActivityFeed runs={recentRuns} startupNames={startupNames} />
           </div>
@@ -251,7 +251,7 @@ export default async function DashboardPage() {
   )
 }
 
-// KPI カードコンポーネント
+// KPI Card Component
 function KPICard({ label, value, sub, color, progress, detail }: {
   label: string
   value: string
@@ -289,7 +289,7 @@ function KPICard({ label, value, sub, color, progress, detail }: {
   )
 }
 
-// セクションヘッダー
+// Section Header
 function SectionHeader({ title, count, detail }: { title: string; count?: number; detail?: string }) {
   return (
     <div className="flex items-center justify-between mb-2.5">
