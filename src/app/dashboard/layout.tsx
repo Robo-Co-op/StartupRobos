@@ -3,8 +3,9 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-const navItems = [
+const overviewItems = [
   { href: '/dashboard', label: 'Dashboard', icon: DashboardIcon, exact: true },
+  { href: '/dashboard/activity', label: 'Live Activity', icon: ActivityIcon, live: true },
   { href: '/dashboard/startups', label: 'Startups', icon: StartupsIcon, badge: '3' },
   { href: '/dashboard/budget', label: 'Budget', icon: BudgetIcon },
 ]
@@ -15,13 +16,13 @@ const projectLinks = [
   { href: 'https://robo-co-op.github.io/puzzle-games/', label: 'Puzzle Games', color: '#22c55e' },
 ]
 
-const ceo = { label: 'CEO', model: 'Opus', color: '#f59e0b' }
+const ceo = { href: '/dashboard/agents/ceo', label: 'CEO', model: 'Opus', color: '#f59e0b' }
 
 const cxoAgents = [
-  { label: 'CTO', model: 'Sonnet', color: '#3b82f6' },
-  { label: 'CMO', model: 'Sonnet', color: '#ec4899' },
-  { label: 'COO', model: 'Sonnet', color: '#f97316' },
-  { label: 'CFO', model: 'Sonnet', color: '#22c55e' },
+  { href: '/dashboard/agents/cto', label: 'CTO', model: 'Sonnet', color: '#3b82f6' },
+  { href: '/dashboard/agents/cmo', label: 'CMO', model: 'Sonnet', color: '#ec4899' },
+  { href: '/dashboard/agents/coo', label: 'COO', model: 'Sonnet', color: '#f97316' },
+  { href: '/dashboard/agents/cfo', label: 'CFO', model: 'Sonnet', color: '#22c55e' },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -33,7 +34,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside className="w-60 shrink-0 border-r border-[#1c1c22] flex flex-col bg-[#09090b]">
         {/* Logo */}
         <div className="px-5 py-4 border-b border-[#1c1c22]">
-          <div className="flex items-center gap-2.5">
+          <Link href="/dashboard" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-sm font-bold shadow-lg shadow-purple-900/30">
               L
             </div>
@@ -41,7 +42,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <p className="text-sm font-semibold leading-none tracking-tight">Launchpad</p>
               <p className="text-[11px] text-zinc-500 mt-0.5">Mission Control</p>
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Navigation */}
@@ -50,7 +51,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div>
             <p className="text-[10px] text-zinc-600 font-semibold px-2 mb-2 uppercase tracking-[0.1em]">Overview</p>
             <div className="space-y-0.5">
-              {navItems.map((item) => {
+              {overviewItems.map((item) => {
                 const isActive = item.exact
                   ? pathname === item.href
                   : pathname.startsWith(item.href)
@@ -72,6 +73,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       <span className="text-[10px] bg-zinc-800 text-zinc-400 min-w-[20px] text-center py-0.5 px-1.5 rounded-full">
                         {item.badge}
                       </span>
+                    )}
+                    {item.live && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse-dot" />
                     )}
                   </Link>
                 )
@@ -108,16 +112,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div>
             <p className="text-[10px] text-zinc-600 font-semibold px-2 mb-2 uppercase tracking-[0.1em]">CEO</p>
             <div className="space-y-0.5">
-              <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-[13px] text-zinc-500">
-                <div
-                  className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-bold text-white/90"
-                  style={{ backgroundColor: ceo.color + '20', color: ceo.color }}
-                >
-                  {ceo.label[0]}
-                </div>
-                <span>{ceo.label}</span>
-                <span className="text-[10px] text-zinc-700 ml-auto font-mono">{ceo.model}</span>
-              </div>
+              <AgentLink
+                href={ceo.href}
+                label={ceo.label}
+                model={ceo.model}
+                color={ceo.color}
+                active={pathname === ceo.href}
+              />
             </div>
           </div>
 
@@ -126,19 +127,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <p className="text-[10px] text-zinc-600 font-semibold px-2 mb-2 uppercase tracking-[0.1em]">CxO Team</p>
             <div className="space-y-0.5">
               {cxoAgents.map((agent) => (
-                <div
+                <AgentLink
                   key={agent.label}
-                  className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-[13px] text-zinc-500"
-                >
-                  <div
-                    className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-bold text-white/90"
-                    style={{ backgroundColor: agent.color + '20', color: agent.color }}
-                  >
-                    {agent.label[0]}
-                  </div>
-                  <span>{agent.label}</span>
-                  <span className="text-[10px] text-zinc-700 ml-auto font-mono">{agent.model}</span>
-                </div>
+                  href={agent.href}
+                  label={agent.label}
+                  model={agent.model}
+                  color={agent.color}
+                  active={pathname === agent.href}
+                />
               ))}
             </div>
           </div>
@@ -161,11 +157,53 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   )
 }
 
-// SVG icon components
+function AgentLink({
+  href,
+  label,
+  model,
+  color,
+  active,
+}: {
+  href: string
+  label: string
+  model: string
+  color: string
+  active: boolean
+}) {
+  return (
+    <Link
+      href={href}
+      className={`flex items-center gap-2.5 px-2 py-1.5 rounded-md text-[13px] transition-all duration-150 ${
+        active
+          ? 'bg-purple-500/10 text-purple-300 border-l-2 border-purple-500 pl-2.5'
+          : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'
+      }`}
+    >
+      <div
+        className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-bold shrink-0"
+        style={{ backgroundColor: color + '20', color }}
+      >
+        {label[0]}
+      </div>
+      <span>{label}</span>
+      <span className="text-[10px] text-zinc-700 ml-auto font-mono">{model}</span>
+    </Link>
+  )
+}
+
+// SVGアイコン
 function DashboardIcon({ active }: { active: boolean }) {
   return (
     <svg className={`w-4 h-4 ${active ? 'text-purple-400' : 'text-zinc-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+    </svg>
+  )
+}
+
+function ActivityIcon({ active }: { active: boolean }) {
+  return (
+    <svg className={`w-4 h-4 ${active ? 'text-purple-400' : 'text-zinc-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h3l3-9 6 18 3-9h3" />
     </svg>
   )
 }
