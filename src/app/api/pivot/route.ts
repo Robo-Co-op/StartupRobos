@@ -35,13 +35,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Pivot limit reached' }, { status: 403 })
   }
 
-  await supabaseService.from('pivot_log').insert({
+  const { error: insertError } = await supabaseService.from('pivot_log').insert({
     startup_id: startupId,
     pivot_from: pivotFrom ?? 'Current Model',
     pivot_to: pivotTo ?? 'AI-Suggested Model',
     reason,
     agent_suggestion: maskPII(agentSuggestion),
   })
+  if (insertError) return NextResponse.json({ error: 'Failed to record pivot' }, { status: 500 })
 
   await supabaseService
     .from('startups')

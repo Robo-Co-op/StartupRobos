@@ -6,8 +6,10 @@ import { calcCost } from '@/lib/agent/costs'
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
 function isAuthorized(req: NextRequest) {
+  const secret = process.env.CRON_SECRET
+  if (!secret) return false
   const auth = req.headers.get('authorization')
-  return auth === `Bearer ${process.env.CRON_SECRET}`
+  return auth === `Bearer ${secret}`
 }
 
 // Business-specific CXO tasks (CMO + CTO)

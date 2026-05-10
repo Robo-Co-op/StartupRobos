@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     )
     return NextResponse.json(result)
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'An error occurred during the CXO meeting'
-    return NextResponse.json({ error: message }, { status: 400 })
+    console.error('[cxo/run]', err)
+    return NextResponse.json({ error: 'An error occurred during the CXO meeting' }, { status: 500 })
   }
 }

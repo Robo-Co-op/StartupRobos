@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     const result = await runAgent(config, sanitizedPrompt, supabaseService)
     return NextResponse.json(result)
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'An unexpected error occurred'
-    return NextResponse.json({ error: message }, { status: 400 })
+    console.error('[agent/run]', err)
+    return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 })
   }
 }

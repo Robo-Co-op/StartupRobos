@@ -8,8 +8,10 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
 // Vercel Cron sends Authorization: Bearer {CRON_SECRET}
 function isAuthorized(req: NextRequest) {
+  const secret = process.env.CRON_SECRET
+  if (!secret) return false
   const auth = req.headers.get('authorization')
-  return auth === `Bearer ${process.env.CRON_SECRET}`
+  return auth === `Bearer ${secret}`
 }
 
 export async function GET(req: NextRequest) {
