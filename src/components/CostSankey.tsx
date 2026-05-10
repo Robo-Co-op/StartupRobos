@@ -14,14 +14,7 @@ interface Props {
   height?: number
 }
 
-const TASK_AGENT: Record<string, { label: string; color: string; role: string }> = {
-  pivot_analysis: { label: 'CEO', color: '#f59e0b', role: 'ceo' },
-  mvp_spec: { label: 'CTO', color: '#3b82f6', role: 'cto' },
-  market_research: { label: 'CMO', color: '#ec4899', role: 'cmo' },
-  ops_review: { label: 'COO', color: '#f97316', role: 'coo' },
-  budget_review: { label: 'CFO', color: '#22c55e', role: 'cfo' },
-  pivot_decision: { label: 'CEO', color: '#f59e0b', role: 'ceo' },
-}
+import { TASK_AGENT } from '@/lib/agent/roles'
 
 const PROJECT_COLORS: Record<string, string> = {
   'AI Tool Lab': '#3b82f6',

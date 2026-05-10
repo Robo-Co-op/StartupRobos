@@ -1,12 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { CXO_SYSTEM_PROMPTS, CXO_MODELS, type CXORole } from './cxo'
-
-const TOKEN_COSTS = {
-  'claude-haiku-4-5-20251001': { input: 1.00, output: 5.00 },
-  'claude-sonnet-4-6': { input: 3.00, output: 15.00 },
-  'claude-opus-4-6': { input: 15.00, output: 75.00 },
-} as const
+import { deductBudget } from '@/lib/agent/budgetDeduction'
+import { calcCost } from '@/lib/agent/costs'
 
 // 最低予算: CXO 4名 (sonnet) + CEO (opus) の概算上限
 const MIN_BUDGET_USD = 0.10
@@ -30,11 +26,6 @@ interface CXOReport {
   tokensOut: number
 }
 
-function calcCost(model: string, tokensIn: number, tokensOut: number): number {
-  const costs = TOKEN_COSTS[model as keyof typeof TOKEN_COSTS]
-  if (!costs) throw new Error(`Unknown model: ${model}`)
-  return (tokensIn / 1_000_000 * costs.input) + (tokensOut / 1_000_000 * costs.output)
-}
 
 export async function runCouncil(
   userId: string,
@@ -125,14 +116,9 @@ export async function runCouncil(
     },
   ])
 
-  // 予算更新
-  await supabase
-    .from('token_budgets')
-    .update({
-      spent_usd: Number(budget.spent_usd) + totalCostUsd,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('user_id', userId)
+  // アトミックに予算控除（TOCTOU 競合を排除）
+  const deduction = await deductBudget(supabase, userId, totalCostUsd)
+  if (!deduction.ok) throw new Error('トークン予算が不足しています（並列控除で上限超過）')
 
   // CXOセッション保存
   const { data: session } = await supabase
@@ -159,6 +145,6 @@ export async function runCouncil(
     cfoReport: byRole.cfo.content,
     ceoDecision,
     totalCostUsd,
-    budgetRemaining: remainingUsd - totalCostUsd,
+    budgetRemaining: deduction.remaining ?? 0,
   }
 }

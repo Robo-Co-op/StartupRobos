@@ -3,36 +3,9 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase/client'
-
-// task_type → エージェント
-const TASK_AGENT: Record<string, { label: string; color: string; role: string }> = {
-  pivot_analysis: { label: 'CEO', color: '#f59e0b', role: 'ceo' },
-  mvp_spec: { label: 'CTO', color: '#3b82f6', role: 'cto' },
-  market_research: { label: 'CMO', color: '#ec4899', role: 'cmo' },
-  ops_review: { label: 'COO', color: '#f97316', role: 'coo' },
-  budget_review: { label: 'CFO', color: '#22c55e', role: 'cfo' },
-}
-
-const TASK_LABELS: Record<string, string> = {
-  pivot_analysis: 'Pivot Analysis',
-  market_research: 'Market Research',
-  mvp_spec: 'MVP Specification',
-  pivot_decision: 'Pivot Decision',
-  budget_review: 'Budget Review',
-  ops_review: 'Operations Review',
-}
-
-const TYPE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  affiliate_seo: { label: 'Affiliate SEO', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)' },
-  digital_product: { label: 'Digital Product', color: '#a855f7', bg: 'rgba(168, 85, 247, 0.1)' },
-  game_ads: { label: 'Game + Ads', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.1)' },
-}
-
-const SITE_URLS: Record<string, string> = {
-  'AI Tool Lab': 'https://robo-co-op.github.io/ai-tool-lab/',
-  'Prompt Pack': 'https://robo-co-op.github.io/prompt-pack/',
-  'Puzzle Games': 'https://robo-co-op.github.io/puzzle-games/',
-}
+import { timeAgo } from '@/lib/timeAgo'
+import { TASK_AGENT } from '@/lib/agent/roles'
+import { TYPE_CONFIG, SITE_URLS } from '@/lib/startup/config'
 
 async function getStartupData(id: string) {
   try {
@@ -64,15 +37,6 @@ async function getStartupData(id: string) {
   }
 }
 
-function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'now'
-  if (mins < 60) return `${mins}m ago`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours}h ago`
-  return `${Math.floor(hours / 24)}d ago`
-}
 
 export default async function StartupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -261,9 +225,7 @@ export default async function StartupDetailPage({ params }: { params: Promise<{ 
             <div className="space-y-2">
               {runs.slice(0, 10).map((run: any, i: number) => {
                 const agent = run.task_type ? TASK_AGENT[run.task_type] : null
-                const taskLabel = run.task_type
-                  ? TASK_LABELS[run.task_type] || run.task_type
-                  : 'Unknown'
+                const taskLabel = agent?.taskLabel ?? run.task_type ?? 'Unknown'
                 const resultPreview = typeof run.result === 'string'
                   ? run.result.slice(0, 140).replace(/\n/g, ' ')
                   : ''

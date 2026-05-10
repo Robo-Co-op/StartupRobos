@@ -2,29 +2,13 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/client'
+import { timeAgo } from '@/lib/timeAgo'
+import { TASK_AGENT } from '@/lib/agent/roles'
 
 // Agent Inbox: 人間承認待ちのタスクをGmail風のリストで集約
 // 現状 experiments の pivoted/failed を approval対象として表示
 // 将来は approvals テーブルを追加して明示的に管理
 
-const TASK_AGENT: Record<string, { label: string; color: string }> = {
-  pivot_analysis: { label: 'CEO', color: '#f59e0b' },
-  mvp_spec: { label: 'CTO', color: '#3b82f6' },
-  market_research: { label: 'CMO', color: '#ec4899' },
-  ops_review: { label: 'COO', color: '#f97316' },
-  budget_review: { label: 'CFO', color: '#22c55e' },
-  pivot_decision: { label: 'CEO', color: '#f59e0b' },
-}
-
-function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'now'
-  if (mins < 60) return `${mins}m`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours}h`
-  return `${Math.floor(hours / 24)}d`
-}
 
 async function getInboxItems() {
   try {

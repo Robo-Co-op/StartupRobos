@@ -3,24 +3,8 @@
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { getSupabaseClient } from '@/lib/supabase/client'
-
-// task_type → エージェント情報
-const TASK_AGENT: Record<string, { label: string; color: string; role: string }> = {
-  pivot_analysis: { label: 'CEO', color: '#f59e0b', role: 'ceo' },
-  mvp_spec: { label: 'CTO', color: '#3b82f6', role: 'cto' },
-  market_research: { label: 'CMO', color: '#ec4899', role: 'cmo' },
-  ops_review: { label: 'COO', color: '#f97316', role: 'coo' },
-  budget_review: { label: 'CFO', color: '#22c55e', role: 'cfo' },
-}
-
-const TASK_LABELS: Record<string, string> = {
-  pivot_analysis: 'Pivot Analysis',
-  market_research: 'Market Research',
-  mvp_spec: 'MVP Specification',
-  pivot_decision: 'Pivot Decision',
-  budget_review: 'Budget Review',
-  ops_review: 'Operations Review',
-}
+import { timeAgo } from '@/lib/timeAgo'
+import { TASK_AGENT } from '@/lib/agent/roles'
 
 interface Run {
   id: string
@@ -35,17 +19,6 @@ interface Run {
 interface Startup {
   id: string
   name: string
-}
-
-function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime()
-  const secs = Math.floor(diff / 1000)
-  if (secs < 60) return `${secs}s ago`
-  const mins = Math.floor(secs / 60)
-  if (mins < 60) return `${mins}m ago`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours}h ago`
-  return `${Math.floor(hours / 24)}d ago`
 }
 
 export default function ActivityPage() {
@@ -168,7 +141,7 @@ export default function ActivityPage() {
             {runs.map((run, i) => {
               const agent = run.task_type ? TASK_AGENT[run.task_type] : null
               const startup = run.startup_id ? startups[run.startup_id] : null
-              const taskLabel = run.task_type ? TASK_LABELS[run.task_type] || run.task_type : 'Unknown'
+              const taskLabel = agent?.taskLabel ?? run.task_type ?? 'Unknown'
               const isNew = newIds.has(run.id)
 
               return (

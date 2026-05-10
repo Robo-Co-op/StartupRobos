@@ -1,18 +1,13 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { deductBudget } from '@/lib/agent/budgetDeduction'
+import { calcCost, type ModelName } from '@/lib/agent/costs'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
-// Token costs per model (USD / 1 million tokens)
-const TOKEN_COSTS = {
-  'claude-haiku-4-5-20251001': { input: 1.00, output: 5.00 },
-  'claude-sonnet-4-6': { input: 3.00, output: 15.00 },
-  'claude-opus-4-6': { input: 15.00, output: 75.00 },
-} as const
-
-export type ModelName = keyof typeof TOKEN_COSTS
+export type { ModelName }
 
 export interface AgentConfig {
   userId: string
@@ -62,8 +57,7 @@ export async function runAgent(
 
   const tokensIn = response.usage.input_tokens
   const tokensOut = response.usage.output_tokens
-  const costs = TOKEN_COSTS[model]
-  const costUsd = (tokensIn / 1_000_000 * costs.input) + (tokensOut / 1_000_000 * costs.output)
+  const costUsd = calcCost(model, tokensIn, tokensOut)
 
   // Save execution record
   await supabaseServiceClient.from('agent_runs').insert({
@@ -76,14 +70,9 @@ export async function runAgent(
     task_type: config.taskType,
   })
 
-  // Update budget
-  await supabaseServiceClient
-    .from('token_budgets')
-    .update({
-      spent_usd: Number(budget.spent_usd) + costUsd,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('user_id', config.userId)
+  // アトミックに予算控除（TOCTOU 競合を排除）
+  const deduction = await deductBudget(supabaseServiceClient, config.userId, costUsd)
+  if (!deduction.ok) throw new Error('Token budget exhausted (concurrent deduction failed)')
 
   const content = response.content[0].type === 'text' ? response.content[0].text : ''
 
@@ -91,7 +80,7 @@ export async function runAgent(
     content,
     tokensUsed: { input: tokensIn, output: tokensOut },
     costUsd,
-    budgetRemaining: remainingUsd - costUsd,
+    budgetRemaining: deduction.remaining ?? 0,
   }
 }
 

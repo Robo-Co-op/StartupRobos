@@ -2,25 +2,11 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/client'
+import { timeAgo } from '@/lib/timeAgo'
+import { TASK_AGENT } from '@/lib/agent/roles'
 
 // Artifact Gallery: エージェントが生んだ成果物（レポート・サイト・商品）の画廊
 // 現状は3つの公開サイト + CEO/CXOレポートを時系列Masonry表示
-
-const TASK_AGENT: Record<string, { label: string; color: string; role: string }> = {
-  pivot_analysis: { label: 'CEO', color: '#f59e0b', role: 'ceo' },
-  mvp_spec: { label: 'CTO', color: '#3b82f6', role: 'cto' },
-  market_research: { label: 'CMO', color: '#ec4899', role: 'cmo' },
-  ops_review: { label: 'COO', color: '#f97316', role: 'coo' },
-  budget_review: { label: 'CFO', color: '#22c55e', role: 'cfo' },
-}
-
-const TASK_LABELS: Record<string, string> = {
-  pivot_analysis: 'Pivot Analysis',
-  mvp_spec: 'MVP Spec',
-  market_research: 'Market Research',
-  ops_review: 'Ops Review',
-  budget_review: 'Budget Review',
-}
 
 const PUBLIC_SITES = [
   {
@@ -49,14 +35,6 @@ const PUBLIC_SITES = [
   },
 ]
 
-function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 60) return `${mins}m`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours}h`
-  return `${Math.floor(hours / 24)}d`
-}
 
 async function getArtifacts() {
   try {
@@ -162,7 +140,7 @@ export default async function ArtifactsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {runs.map((run: any, i: number) => {
                 const agent = run.task_type ? TASK_AGENT[run.task_type] : null
-                const taskLabel = run.task_type ? TASK_LABELS[run.task_type] || run.task_type : 'Task'
+                const taskLabel = agent?.taskLabel ?? run.task_type ?? 'Task'
                 const startup = run.startup_id ? startupMap[run.startup_id] : null
                 const preview = typeof run.result === 'string'
                   ? run.result.slice(0, 280).replace(/[#*_]/g, '').trim()

@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createServiceClient } from '@/lib/supabase/client'
+import { calcCost } from '@/lib/agent/costs'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
 function isAuthorized(req: NextRequest) {
+  const secret = process.env.CRON_SECRET
+  if (!secret) return false
   const auth = req.headers.get('authorization')
-  return auth === `Bearer ${process.env.CRON_SECRET}`
+  return auth === `Bearer ${secret}`
 }
 
 // Business-specific CXO tasks (CMO + CTO)
@@ -93,7 +96,7 @@ export async function GET(req: NextRequest) {
     })
 
     const content = response.content[0].type === 'text' ? response.content[0].text : ''
-    const costUsd = (response.usage.input_tokens / 1_000_000 * 3.0) + (response.usage.output_tokens / 1_000_000 * 15.0)
+    const costUsd = calcCost('claude-sonnet-4-6', response.usage.input_tokens, response.usage.output_tokens)
     totalCost += costUsd
 
     await supabase.from('agent_runs').insert({
@@ -119,7 +122,7 @@ export async function GET(req: NextRequest) {
     })
 
     const content = response.content[0].type === 'text' ? response.content[0].text : ''
-    const costUsd = (response.usage.input_tokens / 1_000_000 * 3.0) + (response.usage.output_tokens / 1_000_000 * 15.0)
+    const costUsd = calcCost('claude-sonnet-4-6', response.usage.input_tokens, response.usage.output_tokens)
     totalCost += costUsd
 
     // COO/CFO handle overall responsibilities using representative startup_id
