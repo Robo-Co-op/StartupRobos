@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/client'
 import { maskPII } from '@/lib/security/piiMasker'
+import { MAX_PIVOTS } from '@/lib/startup/config'
 import { z } from 'zod'
-
-const MAX_PIVOTS = 30
 
 const requestSchema = z.object({
   startupId: z.string().uuid(),
   agentSuggestion: z.string().max(10000),
-  taskType: z.string(),
   pivotFrom: z.string().max(500).optional(),
   pivotTo: z.string().max(500).optional(),
   reason: z.string().max(1000).optional(),

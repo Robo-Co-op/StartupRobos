@@ -27,10 +27,7 @@ export function makeRateLimiter(
     return async (_userId: string) => true
   }
 
-  // Upstash Redis クライアントを生成
   const redis = new Redis({ url, token })
-
-  // スライディングウィンドウ方式でレートリミッターを生成
   const ratelimiter = new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(limit, `${windowSeconds} s`),
@@ -38,7 +35,12 @@ export function makeRateLimiter(
   })
 
   return async (userId: string): Promise<boolean> => {
-    const { success } = await ratelimiter.limit(userId)
-    return success
+    try {
+      const { success } = await ratelimiter.limit(userId)
+      return success
+    } catch {
+      // Redis 障害時はリクエストを通す（可用性優先）
+      return true
+    }
   }
 }

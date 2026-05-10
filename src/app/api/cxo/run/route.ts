@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createServiceClient } from '@/lib/supabase/client'
 import { maskPII } from '@/lib/security/piiMasker'
+import { MAX_PIVOTS } from '@/lib/startup/config'
 import { runCouncil } from '@/lib/agent/council'
 import { makeRateLimiter } from '@/lib/rateLimit'
 
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
     `Company: ${startup.name}`,
     startup.description ? `Description: ${startup.description}` : '',
     `Status: ${startup.status}`,
-    `Pivots: ${startup.pivot_count} / 30`,
+    `Pivots: ${startup.pivot_count} / ${MAX_PIVOTS}`,
   ].filter(Boolean).join('\n')
 
   const sanitizedAgenda = maskPII(agenda)

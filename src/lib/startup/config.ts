@@ -1,3 +1,5 @@
+export const MAX_PIVOTS = 30
+
 export interface BusinessTypeConfig {
   label: string
   color: string
