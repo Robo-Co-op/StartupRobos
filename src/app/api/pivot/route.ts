@@ -44,10 +44,11 @@ export async function POST(req: NextRequest) {
   })
   if (insertError) return NextResponse.json({ error: 'Failed to record pivot' }, { status: 500 })
 
-  await supabaseService
+  const { error: updateError } = await supabaseService
     .from('startups')
     .update({ pivot_count: startup.pivot_count + 1, status: 'pivoted' })
     .eq('id', startupId)
+  if (updateError) return NextResponse.json({ error: 'Failed to update startup' }, { status: 500 })
 
   return NextResponse.json({ success: true })
 }
