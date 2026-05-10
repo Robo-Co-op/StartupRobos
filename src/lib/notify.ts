@@ -1,6 +1,20 @@
 // Email notification utility (Resend API)
+
+export function escapeHtml(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+export function markdownToHtml(body: string): string {
+  return body
+    .replace(/^## (.+)$/gm, (_, g) => `<h2>${escapeHtml(g)}</h2>`)
+    .replace(/^### (.+)$/gm, (_, g) => `<h3>${escapeHtml(g)}</h3>`)
+    .replace(/^- (.+)$/gm, (_, g) => `<li>${escapeHtml(g)}</li>`)
+    .replace(/\*\*(.+?)\*\*/g, (_, g) => `<strong>${escapeHtml(g)}</strong>`)
+    .replace(/\n/g, '<br>')
+}
+
 const RESEND_API_KEY = process.env.RESEND_API_KEY
-const NOTIFY_EMAILS = (process.env.NOTIFY_EMAIL || 'jintkim@roboco-op.org')
+const NOTIFY_EMAILS = (process.env.NOTIFY_EMAIL ?? '')
   .split(',')
   .map(e => e.trim())
   .filter(Boolean)
@@ -10,14 +24,12 @@ export async function sendReport(subject: string, body: string) {
     console.warn('RESEND_API_KEY not configured — skipping email notification')
     return
   }
+  if (NOTIFY_EMAILS.length === 0) {
+    console.warn('NOTIFY_EMAIL not configured — skipping email notification')
+    return
+  }
 
-  // Convert markdown to HTML (simple)
-  const html = body
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n/g, '<br>')
+  const html = markdownToHtml(body)
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',

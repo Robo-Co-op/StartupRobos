@@ -1,12 +1,7 @@
+import { timeAgo } from '@/lib/timeAgo'
+import { TASK_AGENT } from '@/lib/agent/roles'
+
 // task_typeごとに役職を分離する（model単位だとSonnet勢がまとまってしまう）
-const TASK_AGENT: Record<string, { label: string; color: string; taskLabel: string }> = {
-  pivot_analysis: { label: 'CEO', color: '#f59e0b', taskLabel: 'Pivot Analysis' },
-  mvp_spec: { label: 'CTO', color: '#3b82f6', taskLabel: 'MVP Specification' },
-  market_research: { label: 'CMO', color: '#ec4899', taskLabel: 'Market Research' },
-  ops_review: { label: 'COO', color: '#f97316', taskLabel: 'Operations Review' },
-  budget_review: { label: 'CFO', color: '#22c55e', taskLabel: 'Budget Review' },
-  pivot_decision: { label: 'CEO', color: '#f59e0b', taskLabel: 'Pivot Decision' },
-}
 
 interface AgentRun {
   id: string
@@ -22,15 +17,6 @@ interface AgentActivityFeedProps {
   startupNames: Record<string, string>
 }
 
-function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'now'
-  if (mins < 60) return `${mins}m`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours}h`
-  return `${Math.floor(hours / 24)}d`
-}
 
 export default function AgentActivityFeed({ runs, startupNames }: AgentActivityFeedProps) {
   if (runs.length === 0) {

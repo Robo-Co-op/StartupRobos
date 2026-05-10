@@ -25,13 +25,15 @@ interface Props {
   referenceEnd?: number  // 基準時刻（ms）
 }
 
-const TASK_AGENT: Record<string, { label: string; color: string; role: string }> = {
-  pivot_analysis: { label: 'CEO Pivot Analysis', color: '#f59e0b', role: 'ceo' },
-  mvp_spec: { label: 'CTO MVP Spec', color: '#3b82f6', role: 'cto' },
-  market_research: { label: 'CMO Market Research', color: '#ec4899', role: 'cmo' },
-  ops_review: { label: 'COO Ops Review', color: '#f97316', role: 'coo' },
-  budget_review: { label: 'CFO Budget Review', color: '#22c55e', role: 'cfo' },
-}
+import { TASK_AGENT as TASK_AGENT_DEF } from '@/lib/agent/roles'
+
+// WaterfallTrace 用: label を「役職 タスク名」の複合形式に変換
+const TASK_AGENT = Object.fromEntries(
+  Object.entries(TASK_AGENT_DEF).map(([k, v]) => [
+    k,
+    { label: `${v.label} ${v.taskLabel}`, color: v.color, role: v.role },
+  ])
+)
 
 export default function WaterfallTrace({ runs, referenceEnd }: Props) {
   if (runs.length === 0) {

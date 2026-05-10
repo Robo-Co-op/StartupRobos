@@ -1,9 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { SupabaseClient } from '@supabase/supabase-js'
-
-const TOKEN_COSTS = {
-  'claude-opus-4-6': { input: 15.00, output: 75.00 },
-}
+import { calcCost } from '@/lib/agent/costs'
 
 export interface OnboardingInput {
   languages: string[]
@@ -118,9 +115,7 @@ export async function runCEOOnboarding(
   })
 
   const content = response.content[0].type === 'text' ? response.content[0].text : ''
-  const costs = TOKEN_COSTS['claude-opus-4-6']
-  const costUsd = (response.usage.input_tokens / 1_000_000 * costs.input) +
-                  (response.usage.output_tokens / 1_000_000 * costs.output)
+  const costUsd = calcCost('claude-opus-4-6', response.usage.input_tokens, response.usage.output_tokens)
 
   // 実行ログ保存
   await supabase.from('agent_runs').insert({

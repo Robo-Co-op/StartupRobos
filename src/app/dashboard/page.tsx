@@ -6,6 +6,7 @@ import StartupCard from '@/components/StartupCard'
 import AgentActivityFeed from '@/components/AgentActivityFeed'
 import BurnDownGauge from '@/components/BurnDownGauge'
 import CostSankey from '@/components/CostSankey'
+import { TASK_AGENT } from '@/lib/agent/roles'
 
 async function getDashboardData() {
   try {
@@ -43,16 +44,6 @@ async function getDashboardData() {
   } catch {
     return { startups: [], experiments: [], recentRuns: [], allRuns: [], monthSpend: 0, totalSpend: 0, budgetTotal: 500, totalRuns: 0 }
   }
-}
-
-// task_type ベースでCXO役職を特定する（modelだけだとSonnet勢が全員同じラベルになる）
-const TASK_AGENTS: Record<string, { label: string; color: string; role: string; taskLabel: string }> = {
-  pivot_analysis: { label: 'CEO', color: '#f59e0b', role: 'ceo', taskLabel: 'Pivot Analysis' },
-  mvp_spec: { label: 'CTO', color: '#3b82f6', role: 'cto', taskLabel: 'MVP Specification' },
-  market_research: { label: 'CMO', color: '#ec4899', role: 'cmo', taskLabel: 'Market Research' },
-  ops_review: { label: 'COO', color: '#f97316', role: 'coo', taskLabel: 'Operations Review' },
-  budget_review: { label: 'CFO', color: '#22c55e', role: 'cfo', taskLabel: 'Budget Review' },
-  pivot_decision: { label: 'CEO', color: '#f59e0b', role: 'ceo', taskLabel: 'Pivot Decision' },
 }
 
 export default async function DashboardPage() {
@@ -161,7 +152,7 @@ export default async function DashboardPage() {
           {recentAgentWork.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
               {recentAgentWork.map((run: any, i: number) => {
-                const mapped = run.task_type ? TASK_AGENTS[run.task_type] : undefined
+                const mapped = run.task_type ? TASK_AGENT[run.task_type] : undefined
                 const agent = mapped ?? {
                   label: 'Agent',
                   color: '#71717a',

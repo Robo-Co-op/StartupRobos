@@ -1,16 +1,5 @@
 import Link from 'next/link'
-
-const SITE_URLS: Record<string, string> = {
-  affiliate_seo: 'https://robo-co-op.github.io/ai-tool-lab/',
-  digital_product: 'https://robo-co-op.github.io/prompt-pack/',
-  game_ads: 'https://robo-co-op.github.io/puzzle-games/',
-}
-
-const TYPE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  affiliate_seo: { label: 'Affiliate / SEO', color: '#3b82f6', bg: 'rgba(59,130,246,0.08)' },
-  digital_product: { label: 'Digital Product', color: '#a855f7', bg: 'rgba(168,85,247,0.08)' },
-  game_ads: { label: 'Game + Ads', color: '#22c55e', bg: 'rgba(34,197,94,0.08)' },
-}
+import { TYPE_CONFIG, SITE_URLS_BY_TYPE } from '@/lib/startup/config'
 
 const STATUS_STYLES: Record<string, string> = {
   active: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
@@ -41,7 +30,7 @@ interface StartupCardProps {
 }
 
 export default function StartupCard({ startup, experiments }: StartupCardProps) {
-  const siteUrl = startup.business_type ? SITE_URLS[startup.business_type] : null
+  const siteUrl = startup.business_type ? SITE_URLS_BY_TYPE[startup.business_type] : null
   const typeConfig = startup.business_type ? TYPE_CONFIG[startup.business_type] : null
   const activeExp = experiments.find(e => e.status === 'running') ?? experiments[0]
   const expCount = startup.experiment_count ?? startup.pivot_count

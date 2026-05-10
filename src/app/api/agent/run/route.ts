@@ -2,23 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { runAgent, AgentConfig } from '@/lib/agent/harness'
 import { createServiceClient } from '@/lib/supabase/client'
 import { maskPII } from '@/lib/security/piiMasker'
+import { makeRateLimiter } from '@/lib/rateLimit'
 import { z } from 'zod'
 
-// Rate limiting memory cache (Redis recommended for production)
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
-
-function checkRateLimit(userId: string): boolean {
-  const now = Date.now()
-  const entry = rateLimitMap.get(userId)
-
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(userId, { count: 1, resetAt: now + 60_000 })
-    return true
-  }
-  if (entry.count >= 10) return false
-  entry.count++
-  return true
-}
+// Upstash Redis スライディングウィンドウ: 10リクエスト / 60秒 / ユーザー
+const checkRateLimit = makeRateLimiter(10, 60)
 
 const requestSchema = z.object({
   startupId: z.string().uuid(),
@@ -26,11 +14,15 @@ const requestSchema = z.object({
   prompt: z.string().min(1).max(5000),
 })
 
-// TODO: Add API key auth for Mission Control
 export async function POST(req: NextRequest) {
-  // Rate limit check (10 requests/min) — using IP-based limiting for now
-  const ip = req.headers.get('x-forwarded-for') || 'unknown'
-  if (!checkRateLimit(ip)) {
+  // middleware で検証済みのユーザーID（x-user-id ヘッダー）
+  const userId = req.headers.get('x-user-id')
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Rate limit check (10 requests/min per user)
+  if (!(await checkRateLimit(userId))) {
     return NextResponse.json({ error: 'Rate limit exceeded. Please retry after 1 minute.' }, { status: 429 })
   }
 
@@ -44,7 +36,7 @@ export async function POST(req: NextRequest) {
 
   const supabaseService = createServiceClient()
 
-  // Verify startup exists
+  // Verify startup exists AND belongs to the authenticated user (IDOR prevention)
   const { data: startup } = await supabaseService
     .from('startups')
     .select('id, user_id')
@@ -54,11 +46,13 @@ export async function POST(req: NextRequest) {
   if (!startup) {
     return NextResponse.json({ error: 'Startup not found' }, { status: 404 })
   }
+  if (startup.user_id !== userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   // PII masking
   const sanitizedPrompt = maskPII(prompt)
-  // TODO: Add user context via API key auth
-  const config: AgentConfig = { userId: startup.user_id ?? 'anonymous', startupId, taskType }
+  const config: AgentConfig = { userId, startupId, taskType }
 
   try {
     // Use startup context without user_id since we're doing public read

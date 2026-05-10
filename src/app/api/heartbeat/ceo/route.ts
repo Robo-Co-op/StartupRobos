@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createServiceClient } from '@/lib/supabase/client'
 import { sendReport } from '@/lib/notify'
+import { calcCost } from '@/lib/agent/costs'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
@@ -59,7 +60,7 @@ For each business:
   })
 
   const content = response.content[0].type === 'text' ? response.content[0].text : ''
-  const costUsd = (response.usage.input_tokens / 1_000_000 * 15.0) + (response.usage.output_tokens / 1_000_000 * 75.0)
+  const costUsd = calcCost('claude-opus-4-6', response.usage.input_tokens, response.usage.output_tokens)
 
   // Save execution log to Supabase
   await supabase.from('agent_runs').insert({

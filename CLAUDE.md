@@ -292,3 +292,17 @@ Business 3: [Name] (game_ads)
 - `memory/archive/` is read-only (reference only when needed)
 
 @AGENTS.md
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues for `Robo-Co-op/StartupRobos`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default label vocabulary (`needs-triage`, `ready-for-agent`, etc.). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context repo — `CONTEXT.md` at root + `docs/adr/`. See `docs/agents/domain.md`.
