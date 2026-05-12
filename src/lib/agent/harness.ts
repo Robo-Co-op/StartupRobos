@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { deductBudget } from '@/lib/agent/budgetDeduction'
+import { deductBudget, BudgetExhaustedError } from '@/lib/agent/budgetDeduction'
 import { calcCost, type ModelName } from '@/lib/agent/costs'
 
 const anthropic = new Anthropic({
@@ -45,7 +45,7 @@ export async function runAgent(
 
   if (budgetError || !budget) throw new Error('Budget information not found')
   const remainingUsd = Number(budget.total_usd) - Number(budget.spent_usd)
-  if (remainingUsd <= 0) throw new Error('Token budget exhausted')
+  if (remainingUsd <= 0) throw new BudgetExhaustedError('Token budget exhausted')
 
   // Execute agent
   const response = await anthropic.messages.create({
@@ -72,7 +72,7 @@ export async function runAgent(
 
   // アトミックに予算控除（TOCTOU 競合を排除）
   const deduction = await deductBudget(supabaseServiceClient, config.userId, costUsd)
-  if (!deduction.ok) throw new Error('Token budget exhausted (concurrent deduction failed)')
+  if (!deduction.ok) throw new BudgetExhaustedError('Token budget exhausted (concurrent deduction failed)')
 
   const content = response.content[0].type === 'text' ? response.content[0].text : ''
 

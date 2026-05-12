@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { CXO_SYSTEM_PROMPTS, CXO_MODELS, type CXORole } from './cxo'
-import { deductBudget } from '@/lib/agent/budgetDeduction'
+import { deductBudget, BudgetExhaustedError } from '@/lib/agent/budgetDeduction'
 import { calcCost } from '@/lib/agent/costs'
 
 // 最低予算: CXO 4名 (sonnet) + CEO (opus) の概算上限
@@ -47,7 +47,7 @@ export async function runCouncil(
   if (budgetError || !budget) throw new Error('予算情報が見つかりません')
   const remainingUsd = Number(budget.total_usd) - Number(budget.spent_usd)
   if (remainingUsd < MIN_BUDGET_USD) {
-    throw new Error(`トークン予算が不足しています (残: $${remainingUsd.toFixed(4)})`)
+    throw new BudgetExhaustedError(`トークン予算が不足しています (残: $${remainingUsd.toFixed(4)})`)
   }
 
   const userMessage = `## スタートアップコンテキスト\n${startupContext}\n\n## アジェンダ\n${agenda}`
@@ -118,7 +118,7 @@ export async function runCouncil(
 
   // アトミックに予算控除（TOCTOU 競合を排除）
   const deduction = await deductBudget(supabase, userId, totalCostUsd)
-  if (!deduction.ok) throw new Error('トークン予算が不足しています（並列控除で上限超過）')
+  if (!deduction.ok) throw new BudgetExhaustedError('トークン予算が不足しています（並列控除で上限超過）')
 
   // CXOセッション保存
   const { data: session } = await supabase

@@ -7,6 +7,13 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 
+export class BudgetExhaustedError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'BudgetExhaustedError'
+  }
+}
+
 export async function deductBudget(
   supabase: SupabaseClient,
   userId: string,

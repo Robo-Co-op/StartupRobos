@@ -3,6 +3,7 @@ import { runAgent, AgentConfig } from '@/lib/agent/harness'
 import { createServiceClient } from '@/lib/supabase/client'
 import { maskPII } from '@/lib/security/piiMasker'
 import { makeRateLimiter } from '@/lib/rateLimit'
+import { BudgetExhaustedError } from '@/lib/agent/budgetDeduction'
 import { z } from 'zod'
 
 // Upstash Redis スライディングウィンドウ: 10リクエスト / 60秒 / ユーザー
@@ -59,6 +60,9 @@ export async function POST(req: NextRequest) {
     const result = await runAgent(config, sanitizedPrompt, supabaseService)
     return NextResponse.json(result)
   } catch (err: unknown) {
+    if (err instanceof BudgetExhaustedError) {
+      return NextResponse.json({ error: 'Token budget exhausted' }, { status: 402 })
+    }
     console.error('[agent/run]', err)
     return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 })
   }

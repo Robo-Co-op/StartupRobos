@@ -5,6 +5,7 @@ import { maskPII } from '@/lib/security/piiMasker'
 import { MAX_PIVOTS } from '@/lib/startup/config'
 import { runCouncil } from '@/lib/agent/council'
 import { makeRateLimiter } from '@/lib/rateLimit'
+import { BudgetExhaustedError } from '@/lib/agent/budgetDeduction'
 
 // Upstash Redis スライディングウィンドウ: CXO会議はリソース消費が大きいため3リクエスト / 60秒 / ユーザー
 const checkRateLimit = makeRateLimiter(3, 60)
@@ -66,6 +67,9 @@ export async function POST(req: NextRequest) {
     )
     return NextResponse.json(result)
   } catch (err: unknown) {
+    if (err instanceof BudgetExhaustedError) {
+      return NextResponse.json({ error: 'Token budget exhausted' }, { status: 402 })
+    }
     console.error('[cxo/run]', err)
     return NextResponse.json({ error: 'An error occurred during the CXO meeting' }, { status: 500 })
   }

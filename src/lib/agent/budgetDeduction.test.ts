@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { deductBudget } from './budgetDeduction'
+import { deductBudget, BudgetExhaustedError } from './budgetDeduction'
 
 // Supabase クライアントのモックファクトリー
 function makeSupabase(rpcResult: { data: unknown; error: unknown }): SupabaseClient {
@@ -34,5 +34,15 @@ describe('deductBudget', () => {
     const supabase = makeSupabase({ data: null, error: { message: 'DB connection failed' } })
 
     await expect(deductBudget(supabase, 'user-789', 5)).rejects.toThrow('DB connection failed')
+  })
+})
+
+describe('BudgetExhaustedError', () => {
+  it('Error のサブクラスであり instanceof で判別できる', () => {
+    const err = new BudgetExhaustedError('budget gone')
+    expect(err).toBeInstanceOf(Error)
+    expect(err).toBeInstanceOf(BudgetExhaustedError)
+    expect(err.message).toBe('budget gone')
+    expect(err.name).toBe('BudgetExhaustedError')
   })
 })
