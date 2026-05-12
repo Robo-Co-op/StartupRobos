@@ -1,5 +1,30 @@
 # StartupRobos — Domain Context
 
+## Co-op Lab
+
+StartupRobos is the core tool of **Co-op Lab** — a learning program where refugees form 5-person co-ops and run this together.
+
+**Structure:**
+- 5 refugees form a co-op, matched by language/region
+- Each runs StartupRobos to operate 3 digital businesses
+- Co-op shares learnings, supports each other, contributes PRs back
+
+**Two-wheel OSS model:**
+- **StartupRobos** (this repo): AI-CXO team runs businesses autonomously
+- **RoboBuilder** (github.com/Robo-Co-op/robobuilder): Claude Code protocol that makes CC 5x faster; 12-week curriculum for refugees to become independent developers
+- Refugees run StartupRobos from day 1, learn RoboBuilder in parallel → graduate as self-sufficient developers
+
+**Foundation model:**
+- Both repos are OSS (MIT)
+- Anthropic API costs covered by donations via StartupRobos Foundation
+- Robo Operator (AI agent) continuously improves both repos as CC evolves
+
+**Design principle for agents:**
+- Refugee users may have limited technical background → keep UX simple, decisions minimal
+- Language × region drives business personalization (not generic templates)
+- One-way doors (irreversible actions) always require human confirmation
+- Dignity, agency, long-term livelihood — not just income
+
 ## What this project is
 
 StartupRobos (formerly Launchpad) is an AI CXO multi-agent startup platform. Entrepreneurs onboard once; a team of AI agents (CEO, CTO, CMO, COO, CFO) then runs 3 digital businesses autonomously.
