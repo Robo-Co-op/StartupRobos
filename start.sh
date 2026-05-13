@@ -51,7 +51,7 @@ prompt_with_default() {
     echo -n "  $prompt_text: " >&2
   fi
 
-  read -r result
+  read -r result </dev/tty
 
   if [[ -z "$result" && -n "$default_value" ]]; then
     echo "$default_value"
@@ -82,7 +82,7 @@ prompt_optional() {
     echo -n "  $prompt_text (press Enter to skip): " >&2
   fi
 
-  read -r result
+  read -r result </dev/tty
 
   if [[ -z "$result" && -n "$default_value" ]]; then
     echo "$default_value"
@@ -109,7 +109,7 @@ if ! command -v claude &>/dev/null; then
   echo "  Claude Code CLI is required."
   echo "  Install: npm install -g @anthropic-ai/claude-code@1"
   echo ""
-  read -r -p "  Install now? (y/n): " install_cc
+  read -r -p "  Install now? (y/n): " install_cc </dev/tty
   if [[ "$install_cc" == "y" || "$install_cc" == "Y" ]]; then
     npm install -g @anthropic-ai/claude-code@1
   else
