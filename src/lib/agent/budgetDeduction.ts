@@ -1,8 +1,8 @@
 // アトミックなトークン予算控除
-// Postgres RPC `deduct_budget` を呼び出し、TOCTOU 競合を排除する
+// Postgres RPC `spend_budget` を呼び出し、TOCTOU 競合を排除する
 //
 // 成功: { ok: true, remaining: number }
-// 残量不足（RPC が NULL を返した場合）: { ok: false, remaining: null }
+// 残量不足（RPC が空行を返した場合）: { ok: false, remaining: null }
 // Supabase エラー: throw
 
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -43,19 +43,19 @@ export async function deductBudget(
   userId: string,
   cost: number
 ): Promise<{ ok: boolean; remaining: number | null }> {
-  const { data, error } = await supabase.rpc('deduct_budget', {
+  const { data, error } = await supabase.rpc('spend_budget', {
     p_user_id: userId,
-    p_cost: cost,
+    p_amount: cost,
   })
 
   if (error) {
     throw new Error(error.message)
   }
 
-  if (typeof data !== 'number') {
-    // 残量不足（NULL返却）または予期しない型: 更新対象行なし
+  if (!Array.isArray(data) || data.length === 0) {
+    // 残量不足: UPDATE の WHERE 条件不一致で行が返らない
     return { ok: false, remaining: null }
   }
 
-  return { ok: true, remaining: data }
+  return { ok: true, remaining: Number(data[0].remaining) }
 }
