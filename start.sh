@@ -123,6 +123,9 @@ fi
 # ---------------------------------------------------------------------------
 # 3b. Install robobuilder to ~/.claude/plugins/
 # ---------------------------------------------------------------------------
+# Pin: update this SHA when intentionally upgrading robobuilder
+ROBOBUILDER_REF="main"  # TODO: replace with a pinned commit SHA e.g. "abc1234"
+
 PLUGINS_DIR="$HOME/.claude/plugins"
 ROBOBUILDER_DIR="$PLUGINS_DIR/robobuilder"
 
@@ -130,12 +133,20 @@ mkdir -p "$PLUGINS_DIR"
 
 if [ -d "$ROBOBUILDER_DIR/.git" ]; then
   echo "  Updating robobuilder..."
-  if ! git -C "$ROBOBUILDER_DIR" pull --ff-only 2>/dev/null; then
-    echo "  Warning: robobuilder git pull failed (skipping update)"
+  if ! git -C "$ROBOBUILDER_DIR" fetch --quiet origin 2>/dev/null; then
+    echo "  Warning: robobuilder fetch failed (skipping update)"
+  else
+    git -C "$ROBOBUILDER_DIR" checkout --quiet "$ROBOBUILDER_REF" 2>/dev/null || \
+      echo "  Warning: robobuilder checkout $ROBOBUILDER_REF failed (skipping)"
   fi
 else
   echo "  Installing robobuilder..."
-  git clone --depth 1 https://github.com/Robo-Co-op/robobuilder.git "$ROBOBUILDER_DIR" || echo "  Warning: robobuilder clone failed"
+  if git clone --depth 1 https://github.com/Robo-Co-op/robobuilder.git "$ROBOBUILDER_DIR" 2>/dev/null; then
+    git -C "$ROBOBUILDER_DIR" checkout --quiet "$ROBOBUILDER_REF" 2>/dev/null || \
+      echo "  Warning: robobuilder checkout $ROBOBUILDER_REF failed"
+  else
+    echo "  Warning: robobuilder clone failed"
+  fi
 fi
 
 # ---------------------------------------------------------------------------
