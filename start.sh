@@ -40,7 +40,12 @@ prompt_with_default() {
   default_value=$(get_staff_value "$var_name")
 
   if [[ -n "$default_value" ]]; then
-    local masked="${default_value:0:8}..."
+    local masked
+    if [[ "$default_value" == eyJ* ]]; then
+      masked="[set]"
+    else
+      masked="${default_value:0:4}..."
+    fi
     echo -n "  $prompt_text (default: $masked): " >&2
   else
     echo -n "  $prompt_text: " >&2
@@ -66,7 +71,12 @@ prompt_optional() {
   default_value=$(get_staff_value "$var_name")
 
   if [[ -n "$default_value" ]]; then
-    local masked="${default_value:0:8}..."
+    local masked
+    if [[ "$default_value" == eyJ* ]]; then
+      masked="[set]"
+    else
+      masked="${default_value:0:4}..."
+    fi
     echo -n "  $prompt_text (default: $masked, Enter to skip): " >&2
   else
     echo -n "  $prompt_text (press Enter to skip): " >&2
