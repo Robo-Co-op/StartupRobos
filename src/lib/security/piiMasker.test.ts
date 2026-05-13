@@ -34,6 +34,34 @@ describe('maskPII', () => {
     expect(maskPII('card: 4111 1111 1111 1111')).toBe('card: [CARD_NUMBER]')
   })
 
+  it('080 携帯電話をマスクする', () => {
+    expect(maskPII('080-9876-5432')).toBe('[PHONE]')
+  })
+
+  it('070 携帯電話をマスクする', () => {
+    expect(maskPII('070-1111-2222')).toBe('[PHONE]')
+  })
+
+  it('ドット区切りの携帯電話をマスクする', () => {
+    expect(maskPII('090.1234.5678')).toBe('[PHONE]')
+  })
+
+  it('スペース区切りの携帯電話をマスクする', () => {
+    expect(maskPII('090 1234 5678')).toBe('[PHONE]')
+  })
+
+  it('+81 固定電話（+81-3-1234-5678）をマスクする', () => {
+    expect(maskPII('+81-3-1234-5678')).toBe('[PHONE]')
+  })
+
+  it('080 ハイフンなし（08098765432）をマスクする', () => {
+    expect(maskPII('TEL: 08098765432')).toBe('TEL: [PHONE]')
+  })
+
+  it('070 ハイフンなし（07011112222）をマスクする', () => {
+    expect(maskPII('TEL: 07011112222')).toBe('TEL: [PHONE]')
+  })
+
   it('PII を含まないテキストは変換しない', () => {
     const clean = 'StartupRobos はエージェント型スタートアップ基盤です。'
     expect(maskPII(clean)).toBe(clean)
