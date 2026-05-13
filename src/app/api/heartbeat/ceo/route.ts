@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
 import { createServiceClient } from '@/lib/supabase/client'
 import { sendReport } from '@/lib/notify'
 import { requireCronAuth } from '@/lib/auth'
 import { calcCost } from '@/lib/agent/costs'
 import { extractText } from '@/lib/agent/responseSchemas'
+import { anthropic } from '@/lib/agent/anthropicClient'
 
 // CEO heartbeat calls Opus which can be slow
 export const maxDuration = 300
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
 export async function GET(req: NextRequest) {
   const authError = requireCronAuth(req)

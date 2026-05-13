@@ -1,7 +1,7 @@
-import Anthropic from '@anthropic-ai/sdk'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { calcCost } from '@/lib/agent/costs'
 import { extractText } from '@/lib/agent/responseSchemas'
+import { anthropic } from './anthropicClient'
 
 export interface OnboardingInput {
   languages: string[]
@@ -88,8 +88,6 @@ export async function runCEOOnboarding(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: SupabaseClient<any, any, any>
 ): Promise<OnboardingResult> {
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
-
   // 予算チェック
   const { data: budget, error: budgetError } = await supabase
     .from('token_budgets')

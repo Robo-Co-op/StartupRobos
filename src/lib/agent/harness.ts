@@ -1,4 +1,3 @@
-import Anthropic from '@anthropic-ai/sdk'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { checkBudgetPreFlight, deductBudget, BudgetExhaustedError } from '@/lib/agent/budgetDeduction'
 import { calcCost, type ModelName } from '@/lib/agent/costs'
@@ -8,10 +7,7 @@ import {
   RESPONSE_SCHEMAS,
   type TaskType,
 } from './responseSchemas'
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-})
+import { anthropic } from './anthropicClient'
 
 export type { ModelName }
 

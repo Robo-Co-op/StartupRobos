@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
 import { createServiceClient } from '@/lib/supabase/client'
 import { requireCronAuth } from '@/lib/auth'
 import { calcCost } from '@/lib/agent/costs'
 import { extractText } from '@/lib/agent/responseSchemas'
+import { anthropic } from '@/lib/agent/anthropicClient'
 
 // CXO heartbeat runs 5 sequential AI calls
 export const maxDuration = 300
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
 // Business-specific CXO tasks (CMO + CTO)
 const BUSINESS_TASKS: Record<string, { role: string; prompt: string; task_type: string }> = {

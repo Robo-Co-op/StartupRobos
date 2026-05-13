@@ -1,11 +1,9 @@
-import Anthropic from '@anthropic-ai/sdk'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { CXO_SYSTEM_PROMPTS, CXO_MODELS, type CXORole } from './cxo'
 import { extractText } from './responseSchemas'
 import { checkBudgetPreFlight, deductBudget, BudgetExhaustedError } from '@/lib/agent/budgetDeduction'
 import { calcCost } from '@/lib/agent/costs'
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
+import { anthropic } from './anthropicClient'
 
 // Minimum budget: estimated upper bound for CXO 4 (sonnet) + CEO (opus)
 const MIN_BUDGET_USD = 0.10
