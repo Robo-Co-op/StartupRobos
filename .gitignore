@@ -37,6 +37,9 @@ yarn-error.log*
 # user data
 .user_name
 
+# staff pre-config (contains API keys — never commit)
+env.staff
+
 # vercel
 .vercel
 
