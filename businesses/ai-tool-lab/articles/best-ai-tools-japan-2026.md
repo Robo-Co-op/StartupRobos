@@ -23,14 +23,14 @@ This comprehensive guide covers the best AI tools specifically optimized for peo
 
 #### Why Claude Excels in Japan
 
-- **Superior Japanese language understanding**: Claude demonstrates exceptional nuance with Japanese grammar, keigo (敬語), and business formality levels
+- **Superior Japanese language understanding**: Claude demonstrates exceptional nuance with Japanese grammar, keigo (honorific language), and business formality levels
 - **Handles 200,000-token context**: Process entire meeting transcripts, research papers, or contracts in one go
 - **Excellent for financial/business use**: Japanese financial institutions and consulting firms increasingly adopt Claude for analytical work
 - **Privacy-focused**: Anthropic's emphasis on responsible AI appeals to Japanese companies with strict compliance requirements
 
 #### Japanese-Specific Features
 
-- Perfect for drafting formal business emails (メール対応) with appropriate honorifics
+- Perfect for drafting formal business emails with appropriate honorifics
 - Excels at analyzing Japanese-language documents
 - Understands regional business customs and etiquette
 - Supports kanji, hiragana, and katakana with proper context awareness

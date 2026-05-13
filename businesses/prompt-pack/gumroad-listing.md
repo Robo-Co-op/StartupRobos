@@ -6,69 +6,69 @@ Each listing is formatted for direct copy-paste into Gumroad's product editor.
 
 ---
 
-## Product 1: Claude Code マスタープロンプト集
+## Product 1: Claude Code Master Prompt Collection
 
 ### Listing Details
 
 **Title**:
 ```
-Claude Code マスタープロンプト集 - プロの開発者向け 15+ プロンプトテンプレート
+Claude Code Master Prompt Collection - 15+ Prompt Templates for Professional Developers
 ```
 
 **Price**: $9
 
 **Description** (copy directly to Gumroad):
 ```
-エンジニアの生産性を 50% 上げる、15 個の実践的なプロンプトテンプレート集。
+Increase engineer productivity by 50% with 15 practical prompt templates.
 
-Claude Code でコーディングを高速化・品質向上させるための、すぐに使えるプロンプト集です。
+Ready-to-use prompt collection to accelerate coding and improve code quality with Claude Code.
 
-【このパックに含まれるプロンプト】
+【Included Prompts】
 
-1. バグ自動診断 - エラーの原因と修正法を即座に提示
-2. コード品質スコアリング - あなたのコードを 100 点で採点、改善点を指摘
-3. リファクタリングプラン - 古いコードをどう改善するか優先度付けで提案
-4. テストケース自動生成 - ユニットテストの網羅的なテストケースを生成
-5. PR 説明文自動生成 - わかりやすい PR 説明をコードから自動生成
-6. コード説明文 - 複雑なロジックを丁寧にドキュメント化
-7. パフォーマンス最適化分析 - ボトルネックを特定し改善法を提案
-8. レガシーコード現代化 - 古い書き方を最新ベストプラクティスに
-9. 依存関係分析 - npm/pip パッケージの不要な依存を整理
-10. セキュリティ脆弱性スキャン - CVSS スコア付きで脆弱性を診断
-11. 関数シグネチャ設計 - 拡張性の高い関数設計をアドバイス
-12. バージョン互換性検証 - ライブラリアップグレード時の互換性確認
-13. エラーハンドリング設計 - 堅牢なエラー処理を体系的に設計
-14. 型設計と型安全性 - TypeScript の型を完全にマスター
-15. スケーラビリティ検証 - 大規模ユーザーに対応できるか診断
+1. Automatic Bug Diagnosis - Instantly identify error causes and suggest fixes
+2. Code Quality Scoring - Rate your code out of 100 and identify improvements
+3. Refactoring Plan - Prioritized suggestions for improving legacy code
+4. Test Case Auto-Generation - Generate comprehensive unit test cases
+5. PR Description Auto-Generation - Automatically create clear PR descriptions from code
+6. Code Documentation - Thoroughly document complex logic
+7. Performance Optimization Analysis - Identify bottlenecks and suggest improvements
+8. Legacy Code Modernization - Update old code to latest best practices
+9. Dependency Analysis - Clean up unnecessary npm/pip package dependencies
+10. Security Vulnerability Scanner - Diagnose vulnerabilities with CVSS scores
+11. Function Signature Design - Advice on designing scalable function signatures
+12. Version Compatibility Verification - Confirm compatibility when upgrading libraries
+13. Error Handling Design - Systematically design robust error handling
+14. Type Design and Type Safety - Master TypeScript types completely
+15. Scalability Verification - Verify ability to handle large-scale users
 
-【各プロンプトの構成】
+【Structure of Each Prompt】
 
-✓ 実際のユースケース説明
-✓ すぐに使えるプロンプトテンプレート
-✓ 実行後の出力例
-✓ 応用例とカスタマイズ方法
+✓ Real-world use case descriptions
+✓ Ready-to-use prompt templates
+✓ Output examples after execution
+✓ Application examples and customization methods
 
-【こんな人向け】
+【Who This Is For】
 
-- フルスタックエンジニア
-- スタートアップの技術リーダー
-- コードの品質を上げたい
-- 開発スピードを上げたい
-- Claude Code を使いこなしたい
+- Full-stack engineers
+- Technical leaders at startups
+- Those wanting to improve code quality
+- Those wanting to increase development speed
+- Those wanting to master Claude Code
 
-【期待できる効果】
+【Expected Benefits】
 
-- コード品質が向上 (品質スコア 20+ ポイント向上)
-- リファクタリング時間が短縮 (50-70% 削減)
-- テスト品質が向上 (カバレッジ 30% 向上)
-- セキュリティリスクが低減
-- チーム全体の技術水準が向上
+- Improved code quality (quality score +20 points)
+- Reduced refactoring time (50-70% reduction)
+- Improved test quality (30% coverage increase)
+- Reduced security risks
+- Elevated technical standards across team
 
-このプロンプント集は、実務で検証済みの方法論に基づいています。
-すぐに仕事に活用できる実践的な内容です。
+This prompt collection is based on field-tested methodology.
+Practical content ready to use immediately at work.
 
-【ファイル形式】
-Markdown (.md) ファイル - ブログ、GitHub、Notion などで参照可能
+【File Format】
+Markdown (.md) file - Viewable on blogs, GitHub, Notion, etc.
 ```
 
 **Tags**:
@@ -108,13 +108,13 @@ return parseInt(value);
 
 ---
 
-## Product 2: ビジネス自動化プロンプト集
+## Product 2: Business Automation Prompt Collection
 
 ### Listing Details
 
 **Title**:
 ```
-ビジネス自動化プロンプト集 - 経営者・マネージャー向け 15+ テンプレート
+Business Automation Prompt Collection - 15+ Templates for Executives and Managers
 ```
 
 **Price**: $12
@@ -214,13 +214,13 @@ Q2のプロダクト開発方針について、ご相談させていただきた
 
 ---
 
-## Product 3: SEOコンテンツ生成プロンプト集
+## Product 3: SEO Content Generation Prompt Collection
 
 ### Listing Details
 
 **Title**:
 ```
-SEO コンテンツ生成プロンプト集 - マーケター・ライター向け 15+ テンプレート
+SEO Content Generation Prompt Collection - 15+ Templates for Marketers and Writers
 ```
 
 **Price**: $9

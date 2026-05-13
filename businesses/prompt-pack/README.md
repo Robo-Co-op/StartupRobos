@@ -1,14 +1,14 @@
-# Claude Prompt Engineering Pack for Japanese Entrepreneurs
+# Claude Prompt Engineering Pack for Entrepreneurs
 
 **Launchpad × Gumroad Launch Project**
 
-Professional prompt templates designed for Japanese entrepreneurs using Claude Code and AI automation. Three specialized packs for different business needs.
+Professional prompt templates designed for entrepreneurs using Claude Code and AI automation. Three specialized packs for different business needs.
 
 ---
 
-## 📦 Product Suite
+## Product Suite
 
-### Pack 1: Claude Code マスタープロンプト集 ($9)
+### Pack 1: Claude Code Master Prompt Collection ($9)
 **15+ ready-to-use prompts for professional coding with Claude Code**
 
 - Debugging and error analysis
@@ -23,7 +23,7 @@ Professional prompt templates designed for Japanese entrepreneurs using Claude C
 
 ---
 
-### Pack 2: ビジネス自動化プロンプト集 ($12)
+### Pack 2: Business Automation Prompt Collection ($12)
 **15+ prompts for business operations automation**
 
 - Email drafting and templates
@@ -38,7 +38,7 @@ Professional prompt templates designed for Japanese entrepreneurs using Claude C
 
 ---
 
-### Pack 3: SEOコンテンツ生成プロンプト集 ($9)
+### Pack 3: SEO Content Generation Prompt Collection ($9)
 **15+ prompts for content marketing and SEO**
 
 - Blog article outlines and structured writing
@@ -53,7 +53,7 @@ Professional prompt templates designed for Japanese entrepreneurs using Claude C
 
 ---
 
-## 💰 Pricing Strategy
+## Pricing Strategy
 
 **Total bundle value**: $30
 - **Individual pack pricing**: $9-12 per pack (20% discount vs. value)
@@ -68,7 +68,7 @@ Professional prompt templates designed for Japanese entrepreneurs using Claude C
 
 ---
 
-## 🚀 Gumroad Setup Steps
+## Gumroad Setup Steps
 
 ### 1. Create Gumroad Account
 - Go to gumroad.com/creator
@@ -100,7 +100,7 @@ Professional prompt templates designed for Japanese entrepreneurs using Claude C
 
 ---
 
-## 📊 Success Metrics
+## Success Metrics
 
 - **Target**: 100 pack downloads in first month
 - **Revenue goal**: $600-1,000 (conservative estimate)
@@ -109,7 +109,7 @@ Professional prompt templates designed for Japanese entrepreneurs using Claude C
 
 ---
 
-## 📝 File Structure
+## File Structure
 
 ```
 /prompt-pack/
@@ -123,7 +123,7 @@ Professional prompt templates designed for Japanese entrepreneurs using Claude C
 
 ---
 
-## 🎯 Launch Timeline
+## Launch Timeline
 
 1. **Week 1**: Create and refine prompt content
 2. **Week 2**: Set up Gumroad accounts and uploads

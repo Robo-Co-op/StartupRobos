@@ -80,7 +80,7 @@ Month 6+: Sustainability ($3,000-10,000/month)
 | **Commission** | 3-10% depending on category |
 | **What to promote** | AI-related books, laptops, peripherals |
 | **Japan Focus** | Perfect for expats in Japan |
-| **Application** | [Amazon.co.jp アソシエイト](https://affiliate.amazon.co.jp/) |
+| **Application** | [Amazon.co.jp Associates](https://affiliate.amazon.co.jp/) |
 | **Monthly Potential** | $100-300/month |
 
 **Strategy**:
@@ -469,8 +469,8 @@ our continued operation. Prices unchanged for you.
 
 ### Japan-Specific Requirements
 
-- 景品表示法 (Representation Act): Clear affiliate disclosure
-- 特定商取引に関する法律 (Specified Commercial Transaction Act): 
+- 景品表示法 (Act against Unjustifiable Premiums and Misleading Representations): Clear affiliate disclosure
+- 特定商取引に関する法律 (Act on Specified Commercial Transaction): 
   If accepting payments, include required info
 - APPI (Act on the Protection of Personal Information): Privacy policy
 

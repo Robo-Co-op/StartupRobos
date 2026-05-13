@@ -1,24 +1,24 @@
-# 日本AIツール比較ラボ (Japan AI Tools Comparison Lab)
+# Japan AI Tools Comparison Lab
 
 > Bilingual SEO site comparing cutting-edge AI tools for Japanese market and international users in Japan.
 
-## 🎯 Mission
+## Mission
 
 Provide comprehensive, unbiased comparisons of AI tools tailored to Japanese users' needs, with affiliate monetization through partner programs.
 
-## 📊 Target Keywords & Strategy
+## Target Keywords & Strategy
 
 ### Primary Keywords (Tier 1)
-- 「Claude ChatGPT 比較」 (Claude vs ChatGPT comparison)
-- 「日本語 AI ツール」 (Japanese language AI tools)
-- 「AI ツール 2026」 (AI tools 2026)
-- 「最高の AI チャットボット」 (Best AI chatbots)
+- Claude vs ChatGPT Comparison (Claude ChatGPT comparison)
+- Japanese language AI tools
+- AI tools 2026
+- Best AI chatbots
 
 ### Secondary Keywords (Tier 2)
-- 「Claude 日本語」 (Claude in Japanese)
-- 「ChatGPT プラス 日本」 (ChatGPT Plus Japan)
-- 「AI ツール 比較」 (AI tool comparison)
-- 「日本 AI 導入」 (AI adoption in Japan)
+- Claude in Japanese
+- ChatGPT Plus Japan
+- AI tool comparison
+- AI adoption in Japan
 
 ## 📄 Content Structure
 
@@ -31,25 +31,25 @@ Provide comprehensive, unbiased comparisons of AI tools tailored to Japanese use
 └── coding-assistant-comparison.md  [Planned]
 ```
 
-## 💰 Affiliate Programs
+## Affiliate Programs
 
 ### Target Programs to Join
 
 | Program | Commission | Status | Link |
 |---------|-----------|--------|------|
 | **Anthropic Claude API Referral** | 10% recurring | TBD | [Apply](https://www.anthropic.com/) |
-| **Amazon Associates JP** | 3-10% | Join | [Amazon.co.jp](https://affiliate.amazon.co.jp/) |
+| **Amazon Associates JP** | 3-10% | Join | [Amazon.co.jp Associates](https://affiliate.amazon.co.jp/) |
 | **OpenAI Affiliate Program** | Check | TBD | [OpenAI](https://openai.com/) |
 | **Supabase Affiliate** | 20% | Join | [Supabase](https://supabase.com/partners) |
 | **Google Cloud (Japan)** | Varies | Join | [Google Cloud](https://cloud.google.com/partners) |
 | **NVIDIA AI Enterprise (Japan)** | TBD | Research | Contact Japan team |
 
 ### Japan-Specific Programs
-- **Rakuten Affiliate** - JP audience reach
+- **Rakuten Affiliate** - Japan audience reach
 - **A8.net** - Largest Japanese affiliate network
-- **Value Commerce** - Premium JP affiliate program
+- **Value Commerce** - Premium Japan affiliate program
 
-## 🎯 Revenue Model
+## Revenue Model
 
 **Multi-channel approach:**
 1. Affiliate commissions (50-60% of revenue)
@@ -62,7 +62,7 @@ Provide comprehensive, unbiased comparisons of AI tools tailored to Japanese use
 - Month 3-4: 1-5 conversions/day, $500-2,000/month
 - Month 6+: Sustainable $3,000-10,000/month across channels
 
-## 📱 Platform Details
+## Platform Details
 
 - **Domain**: ai-tool-lab.jp (or ai-tools-japan.com)
 - **Languages**: Japanese (primary), English (secondary)
@@ -79,7 +79,7 @@ Provide comprehensive, unbiased comparisons of AI tools tailored to Japanese use
   - Twitter/X mentions
   - Japanese tech blogs
 
-## 🚀 Launch Checklist
+## Launch Checklist
 
 - [ ] 5 core comparison articles published
 - [ ] Keyword research validated
@@ -91,11 +91,11 @@ Provide comprehensive, unbiased comparisons of AI tools tailored to Japanese use
 - [ ] Social media scheduled (Twitter, LinkedIn)
 - [ ] Email newsletter signup (1-2 months)
 
-## 📈 Success Metrics
+## Success Metrics
 
 - **Traffic**: 1,000+ organic visitors/month by month 3
 - **Conversion**: 2-3% click-through to affiliate links
-- **Ranking**: Top 3 for 5+ Japanese keywords by month 6
+- **Ranking**: Top 3 for 5+ relevant keywords by month 6
 - **Revenue**: $500+/month by month 3
 
 ---

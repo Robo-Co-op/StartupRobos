@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * セッション開始hook: 前回の記憶とコンテキストを読み込む
- * - MEMORY.md（長期記憶）
- * - 今日・昨日の日次ノート
- * - 直近のagent_runs サマリー
+ * Session start hook: Load previous memory and context
+ * - MEMORY.md (long-term memory)
+ * - Today's and yesterday's daily notes
+ * - Recent agent_runs summary
  */
 const fs = require('fs')
 const path = require('path')
@@ -29,26 +29,26 @@ function readIfExists(filePath) {
 function main() {
   const parts = []
 
-  // 長期記憶
+  // Long-term memory
   const memory = readIfExists(MEMORY_MD)
   if (memory) {
-    parts.push('## 長期記憶 (MEMORY.md)\n' + memory)
+    parts.push('## Long-term Memory (MEMORY.md)\n' + memory)
   }
 
-  // 今日の日次ノート
+  // Today's daily notes
   const today = readIfExists(path.join(MEMORY_DIR, `${getDateStr(0)}.md`))
   if (today) {
-    parts.push(`## 今日のノート (${getDateStr(0)})\n` + today)
+    parts.push(`## Today's Notes (${getDateStr(0)})\n` + today)
   }
 
-  // 昨日の日次ノート
+  // Yesterday's daily notes
   const yesterday = readIfExists(path.join(MEMORY_DIR, `${getDateStr(-1)}.md`))
   if (yesterday) {
-    parts.push(`## 昨日のノート (${getDateStr(-1)})\n` + yesterday)
+    parts.push(`## Yesterday's Notes (${getDateStr(-1)})\n` + yesterday)
   }
 
   if (parts.length > 0) {
-    // セッションコンテキストとして出力
+    // Output as session context
     console.log('--- Launchpad Memory Loaded ---')
     console.log(parts.join('\n\n'))
     console.log('--- End Memory ---')

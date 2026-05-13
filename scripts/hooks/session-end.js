@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * セッション終了hook: セッションの重要情報を日次ノートに保存
- * - 今日のセッションで何をしたか
- * - 重要な決定事項
- * - 次回やるべきこと
+ * Session end hook: Save important session information to daily notes
+ * - What was done in today's session
+ * - Important decisions
+ * - Next steps to take
  */
 const fs = require('fs')
 const path = require('path')
@@ -20,7 +20,7 @@ function getTimeStr() {
 }
 
 function main() {
-  // memory/ ディレクトリ確認
+  // Check memory/ directory
   if (!fs.existsSync(MEMORY_DIR)) {
     fs.mkdirSync(MEMORY_DIR, { recursive: true })
   }
@@ -29,20 +29,20 @@ function main() {
   const timeStr = getTimeStr()
   const dailyFile = path.join(MEMORY_DIR, `${dateStr}.md`)
 
-  // セッションのトランスクリプトからサマリーを抽出
-  // stdin からセッションサマリーを受け取る（CC が渡す）
+  // Extract summary from session transcript
+  // Receive session summary from stdin (passed by CC)
   let input = ''
   try {
     input = fs.readFileSync(0, 'utf-8') // stdin
   } catch {
-    // stdin が空の場合
+    // stdin is empty
   }
 
-  const entry = `\n### セッション ${timeStr} UTC\n${input || '(セッション内容なし)'}\n`
+  const entry = `\n### Session ${timeStr} UTC\n${input || '(No session content)'}\n`
 
-  // 日次ノートに追記
+  // Append to daily notes
   fs.appendFileSync(dailyFile, entry)
-  console.log(`セッション記録を ${dailyFile} に保存しました`)
+  console.log(`Session record saved to ${dailyFile}`)
 }
 
 main()

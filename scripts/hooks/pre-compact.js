@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * pre-compact hook: コンテキスト圧縮前に重要な状態を保存
- * compaction で失われる情報を memory/ に退避する
+ * pre-compact hook: Save important state before context compression
+ * Back up information that would be lost during compaction to memory/
  */
 const fs = require('fs')
 const path = require('path')
@@ -26,17 +26,17 @@ function main() {
   const timeStr = getTimeStr()
   const dailyFile = path.join(MEMORY_DIR, `${dateStr}.md`)
 
-  // stdin からコンテキストサマリーを受け取る
+  // Receive context summary from stdin
   let input = ''
   try {
     input = fs.readFileSync(0, 'utf-8')
   } catch {
-    // stdin なし
+    // No stdin
   }
 
-  const entry = `\n### Pre-compact ${timeStr} UTC\n${input || '(コンテキスト状態なし)'}\n`
+  const entry = `\n### Pre-compact ${timeStr} UTC\n${input || '(No context state)'}\n`
   fs.appendFileSync(dailyFile, entry)
-  console.log(`コンパクション前の状態を保存: ${dailyFile}`)
+  console.log(`Saved pre-compact state: ${dailyFile}`)
 }
 
 main()

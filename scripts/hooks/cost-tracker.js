@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * PostToolUse hook: API呼び出しのコストを追跡
- * Agent ツール使用後にモデル・トークン数を記録
+ * PostToolUse hook: Track cost of API calls
+ * Record model and token count after Agent tool usage
  */
 const fs = require('fs')
 const path = require('path')
@@ -9,7 +9,7 @@ const path = require('path')
 const ROOT = path.resolve(__dirname, '../..')
 const COST_LOG = path.join(ROOT, 'memory', 'cost-log.jsonl')
 
-// モデル別コスト (USD / 1M tokens)
+// Cost per model (USD / 1M tokens)
 const COSTS = {
   'opus': { input: 15.0, output: 75.0 },
   'sonnet': { input: 3.0, output: 15.0 },
@@ -31,7 +31,7 @@ function main() {
     process.exit(0)
   }
 
-  // Agent ツールの結果のみ追跡
+  // Track only Agent tool results
   if (toolResult.tool_name !== 'Agent') {
     process.exit(0)
   }

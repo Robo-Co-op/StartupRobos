@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
- * 夜間統合スクリプト: 日次ノートから重要情報を抽出し MEMORY.md に追記
- * cron: 毎日 17:00 UTC (翌2:00 JST)
+ * Nightly consolidation script: Extract important information from daily notes and append to MEMORY.md
+ * cron: Daily at 17:00 UTC (2:00 JST next day)
  *
- * 処理:
- * 1. 今日の日次ノート (memory/YYYY-MM-DD.md) を読む
- * 2. Haiku で重要情報を抽出
- * 3. MEMORY.md の該当セクションに追記
- * 4. 7日以上古い日次ノートを memory/archive/ に移動
+ * Process:
+ * 1. Read today's daily notes (memory/YYYY-MM-DD.md)
+ * 2. Extract important information with Haiku
+ * 3. Append to corresponding section in MEMORY.md
+ * 4. Move daily notes older than 7 days to memory/archive/
  */
 const fs = require('fs')
 const path = require('path')
@@ -32,25 +32,25 @@ async function extractImportantInfo(dailyContent) {
     max_tokens: 500,
     messages: [{
       role: 'user',
-      content: `以下はLaunchpad（AI起業プラットフォーム）の今日のセッションログです。
-長期記憶に残すべき重要な情報だけを抽出してください。
+      content: `The following is today's session log from Launchpad (an AI entrepreneurship platform).
+Extract only the important information that should be retained in long-term memory.
 
-カテゴリ:
-- 重要な決定（事業方針、技術選定、ピボット）
-- 学習した教訓（トラブルシュートで判明したこと）
-- 新しい事実（アカウント作成、設定変更、デプロイ）
-- 次回やるべきこと
+Categories:
+- Important decisions (business strategy, technology choices, pivots)
+- Lessons learned (insights discovered during troubleshooting)
+- New facts (account creation, configuration changes, deployments)
+- Next steps to take
 
-不要: 日常的なコマンド実行、コード変更の詳細
+Not needed: routine command execution, code change details
 
-各項目は「- YYYY-MM-DD: 内容」の形式で、最大5項目。
-重要なものがなければ「なし」と答えてください。
+Each item should be in the format "- YYYY-MM-DD: content", maximum 5 items.
+If there is nothing important, answer "none".
 
 ---
 ${dailyContent}
 ---`
     }],
-    system: 'あなたは情報抽出アシスタントです。簡潔に、重要な情報だけを抽出します。',
+    system: 'You are an information extraction assistant. Extract only important information concisely.',
   })
 
   return response.content[0].type === 'text' ? response.content[0].text : ''
@@ -72,7 +72,7 @@ function archiveOldNotes() {
         path.join(MEMORY_DIR, file),
         path.join(ARCHIVE_DIR, file)
       )
-      console.log(`アーカイブ: ${file}`)
+      console.log(`Archived: ${file}`)
     }
   }
 }
@@ -82,46 +82,46 @@ async function main() {
   const dailyFile = path.join(MEMORY_DIR, `${today}.md`)
 
   if (!fs.existsSync(dailyFile)) {
-    console.log(`${today} の日次ノートなし。スキップ。`)
+    console.log(`No daily notes for ${today}. Skipping.`)
     archiveOldNotes()
     return
   }
 
   const dailyContent = fs.readFileSync(dailyFile, 'utf-8')
   if (dailyContent.trim().length < 50) {
-    console.log('日次ノートが短すぎるためスキップ。')
+    console.log('Daily notes too short. Skipping.')
     archiveOldNotes()
     return
   }
 
-  console.log('重要情報を抽出中...')
+  console.log('Extracting important information...')
   const extracted = await extractImportantInfo(dailyContent)
 
-  if (extracted && extracted !== 'なし') {
-    // MEMORY.md に追記
+  if (extracted && extracted !== 'none') {
+    // Append to MEMORY.md
     let memoryContent = fs.readFileSync(MEMORY_MD, 'utf-8')
 
-    // 「重要な決定ログ」セクションの末尾に追記
-    const marker = '## 学習した教訓'
+    // Append to the end of "Lessons learned" section
+    const marker = '## Lessons learned'
     if (memoryContent.includes(marker)) {
       memoryContent = memoryContent.replace(
         marker,
         `${extracted}\n\n${marker}`
       )
     } else {
-      memoryContent += `\n\n## ${today} の抽出\n${extracted}\n`
+      memoryContent += `\n\n## Extraction from ${today}\n${extracted}\n`
     }
 
     fs.writeFileSync(MEMORY_MD, memoryContent)
-    console.log(`MEMORY.md を更新しました`)
+    console.log(`MEMORY.md updated`)
   }
 
-  // 古いノートをアーカイブ
+  // Archive old notes
   archiveOldNotes()
-  console.log('夜間統合完了')
+  console.log('Nightly consolidation complete')
 }
 
 main().catch(err => {
-  console.error('夜間統合エラー:', err.message)
+  console.error('Nightly consolidation error:', err.message)
   process.exit(1)
 })

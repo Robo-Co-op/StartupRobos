@@ -1,19 +1,19 @@
-# Google AdSense セットアップガイド
+# Google AdSense Setup Guide
 
-このガイドでは、パズルゲームでAdSenseを最大化するための詳細な手順を説明します。
+This guide provides detailed instructions for maximizing AdSense revenue from puzzle games.
 
-## 目次
-1. [AdSense申請](#adsense申請)
-2. [広告ユニット設定](#広告ユニット設定)
-3. [HTML統合](#html統合)
-4. [RPM最適化戦略](#rpm最適化戦略)
-5. [トラブルシューティング](#トラブルシューティング)
+## Table of Contents
+1. [AdSense Application](#adsense-application)
+2. [Ad Unit Configuration](#ad-unit-configuration)
+3. [HTML Integration](#html-integration)
+4. [RPM Optimization Strategy](#rpm-optimization-strategy)
+5. [Troubleshooting](#troubleshooting)
 
 ---
 
-## AdSense申請
+## AdSense Application
 
-### ステップ1: 申請前の準備
+### Step 1: Pre-Application Preparation
 
 申請するまえに、以下を確認してください:
 
@@ -32,56 +32,56 @@
   - 既存のコンテンツがある場合は必須ではありません
 ```
 
-### ステップ2: AdSenseアカウント作成
+### Step 2: Create AdSense Account
 
-1. https://www.google.com/adsense にアクセス
-2. 「Google アカウント」でログイン (なければ作成)
-3. 「今すぐ開始」をクリック
+1. Go to https://www.google.com/adsense
+2. Log in with your Google account (create one if needed)
+3. Click "Get Started Now"
 
-### ステップ3: サイト登録
+### Step 3: Register Your Site
 
-申請フォームで:
+In the application form:
 
 ```
-サイトURL: https://your-username.github.io/puzzle-games
-時間帯: Japan (UTC+9)
-アカウントの種類: 個人
+Site URL: https://your-username.github.io/puzzle-games
+Time Zone: Japan (UTC+9)
+Account Type: Individual
 ```
 
-### ステップ4: コード承認タグを挿入
+### Step 4: Insert Approval Tag
 
-AdSenseから提供される承認タグを、両ゲームのHTMLファイルに挿入:
+Insert the approval tag provided by AdSense into both game HTML files:
 
 ```html
-<!-- Google AdSense 承認タグ -->
+<!-- Google AdSense Approval Tag -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-xxxxxxxxxxxxxxxx"
      crossorigin="anonymous"></script>
 ```
 
-このタグを `<head>` セクション内に挿入してください。
+Insert this tag in the `<head>` section.
 
-### ステップ5: 申請送信と承認待機
+### Step 5: Submit Application and Wait for Approval
 
-- 申請を送信
-- Google側での審査期間: 通常3-5日
-- メールで結果が通知されます
+- Submit your application
+- Google review period: typically 3-5 days
+- Results will be sent via email
 
-**注意:** AdSenseは国によって申請要件が異なります。日本からの申請の場合、コンテンツの質が重視されます。
+**Note:** AdSense requirements vary by country. For applications from Japan, content quality is heavily weighted.
 
 ---
 
-## 広告ユニット設定
+## Ad Unit Configuration
 
-### 広告ユニットの種類と配置
+### Ad Unit Types and Placement
 
-#### 1. レスポンシブ広告 (推奨)
+#### 1. Responsive Ads (Recommended)
 
-**メリット:**
-- どのデバイスサイズにも自動調整
-- 表示効率が高い
-- RPMが安定している
+**Benefits:**
+- Auto-adjusts to any device size
+- High display efficiency
+- Stable RPM
 
-**配置場所:**
+**Placement:**
 ```html
 <!-- ゲーム下部 (最適な配置) -->
 <div style="text-align: center; margin: 25px 0;">
@@ -97,9 +97,9 @@ AdSenseから提供される承認タグを、両ゲームのHTMLファイルに
 </div>
 ```
 
-#### 2. スクエア広告 (336x280)
+#### 2. Square Ads (336x280)
 
-**配置場所:** サイドバー、ゲーム右側
+**Placement:** Sidebar, right side of game
 
 ```html
 <ins class="adsbygoogle"
@@ -111,9 +111,9 @@ AdSenseから提供される承認タグを、両ゲームのHTMLファイルに
 </script>
 ```
 
-#### 3. バナー広告 (728x90)
+#### 3. Banner Ads (728x90)
 
-**配置場所:** ヘッダー上部
+**Placement:** Header top
 
 ```html
 <ins class="adsbygoogle"
@@ -127,13 +127,13 @@ AdSenseから提供される承認タグを、両ゲームのHTMLファイルに
 
 ---
 
-## HTML統合
+## HTML Integration
 
-### Sudokuゲーム広告配置
+### Sudoku Game Ad Placement
 
-編集対象ファイル: `games/sudoku/index.html`
+File to edit: `games/sudoku/index.html`
 
-**現在のプレースホルダー:** 56行目付近
+**Current placeholder:** around line 56
 
 ```html
 <div class="adsense-placeholder">

@@ -6,36 +6,36 @@
 
 | Rank | Keyword | Search Intent | Monthly Searches (est.) | Difficulty | Article Format | Status |
 |------|---------|----------------|------------------------|------------|-----------------|--------|
-| 1 | Claude ChatGPT 比較 | Comparison/Commercial | 3,200 | Medium | Detailed comparison article | ✅ PUBLISHED |
-| 2 | Claude 日本語 | Information/Commercial | 2,800 | Low | Feature guide + use cases | Planned |
-| 3 | AI ツール 2026 おすすめ | Commercial | 5,400 | Medium-High | Top 10 ranking + affiliate CTA | Planned |
-| 4 | ChatGPT Plus 日本 | Commercial | 2,100 | Medium | How-to + pricing in JPY | Planned |
-| 5 | 最高の AI チャットボット | Commercial | 4,200 | Medium | Ranked comparison + features | Planned |
+| 1 | Claude ChatGPT comparison | Comparison/Commercial | 3,200 | Medium | Detailed comparison article | PUBLISHED |
+| 2 | Claude Japanese | Information/Commercial | 2,800 | Low | Feature guide + use cases | Planned |
+| 3 | AI tools 2026 recommendations | Commercial | 5,400 | Medium-High | Top 10 ranking + affiliate CTA | Planned |
+| 4 | ChatGPT Plus Japan | Commercial | 2,100 | Medium | How-to + pricing in JPY | Planned |
+| 5 | Best AI chatbots | Commercial | 4,200 | Medium | Ranked comparison + features | Planned |
 
 ### Tier 2: Secondary Keywords (Supporting Content)
 
 | Rank | Keyword | Search Intent | Monthly Searches (est.) | Difficulty | Article Format | Status |
 |------|---------|----------------|------------------------|------------|-----------------|--------|
-| 6 | AI ツール 比較 | Comparison | 3,800 | Medium | Comparative table + evaluation | ✅ PUBLISHED |
-| 7 | Claude API 日本 | Information/Commercial | 1,900 | Low-Medium | Setup guide + pricing | Planned |
-| 8 | 日本語対応 AI | Information/Commercial | 2,600 | Low | Tools list + language features | Planned |
-| 9 | リモートワーク AI ツール | Commercial | 2,200 | Medium | Productivity guide + setup | Planned |
-| 10 | AI ライティング ツール 日本 | Commercial | 3,400 | Medium | Writing tool comparison | Planned |
+| 6 | AI tools comparison | Comparison | 3,800 | Medium | Comparative table + evaluation | PUBLISHED |
+| 7 | Claude API Japan | Information/Commercial | 1,900 | Low-Medium | Setup guide + pricing | Planned |
+| 8 | Japanese language AI | Information/Commercial | 2,600 | Low | Tools list + language features | Planned |
+| 9 | Remote work AI tools | Commercial | 2,200 | Medium | Productivity guide + setup | Planned |
+| 10 | AI writing tools Japan | Commercial | 3,400 | Medium | Writing tool comparison | Planned |
 
 ### Tier 3: Long-tail Keywords (Content Cluster)
 
 | Rank | Keyword | Search Intent | Monthly Searches (est.) | Difficulty | Article Format | Status |
 |------|---------|----------------|------------------------|------------|-----------------|--------|
-| 11 | Claude Pro 月額 | Information | 1,200 | Low | Pricing guide + value analysis | Planned |
-| 12 | ChatGPT vs Claude 日本語性能 | Comparison | 1,800 | Low-Medium | Detailed feature comparison | Planned |
-| 13 | AI チャットボット 無料 日本 | Commercial | 2,900 | Low | Free tools ranking | Planned |
-| 14 | Gemini AI 日本語 | Information | 1,500 | Low | Feature guide + comparison | Planned |
-| 15 | AI 文章作成 ツール 比較 | Commercial | 2,100 | Medium | Tool ranking + use cases | Planned |
-| 16 | Perplexity AI 日本語 | Information | 890 | Low | Tutorial + use cases | Planned |
-| 17 | AI プログラミング支援 日本 | Commercial | 1,600 | Medium | Coding tools guide | Planned |
-| 18 | AI 翻訳ツール 日本語精度 | Commercial | 2,200 | Medium | Translation tool comparison | Planned |
-| 19 | ビジネス向け AI ツール | Commercial | 2,400 | Medium-High | B2B tool guide | Planned |
-| 20 | AI アシスタント 業務効率化 | Commercial | 2,700 | Medium | Productivity case studies | Planned |
+| 11 | Claude Pro pricing | Information | 1,200 | Low | Pricing guide + value analysis | Planned |
+| 12 | ChatGPT vs Claude Japanese | Comparison | 1,800 | Low-Medium | Detailed feature comparison | Planned |
+| 13 | Free AI chatbots Japan | Commercial | 2,900 | Low | Free tools ranking | Planned |
+| 14 | Gemini AI Japanese | Information | 1,500 | Low | Feature guide + comparison | Planned |
+| 15 | AI writing tools comparison | Commercial | 2,100 | Medium | Tool ranking + use cases | Planned |
+| 16 | Perplexity AI Japanese | Information | 890 | Low | Tutorial + use cases | Planned |
+| 17 | AI coding assistance Japan | Commercial | 1,600 | Medium | Coding tools guide | Planned |
+| 18 | AI translation tool accuracy | Commercial | 2,200 | Medium | Translation tool comparison | Planned |
+| 19 | Business AI tools | Commercial | 2,400 | Medium-High | B2B tool guide | Planned |
+| 20 | AI assistant productivity | Commercial | 2,700 | Medium | Productivity case studies | Planned |
 
 ---
 
@@ -146,33 +146,33 @@ Dominated by major sites, but high volume:
 ## Content Cluster Structure
 
 ### Main Hub: Claude vs ChatGPT Comparison
-- ✅ **Core Article**: "Claude vs ChatGPT：日本語での実力比較2026年版" (PUBLISHED)
+- ✅ **Core Article**: Claude vs ChatGPT: 2026 Japanese Language Performance Comparison (PUBLISHED)
 - Supporting content:
-  - Claude 日本語 機能ガイド
-  - ChatGPT Plus 完全ガイド
-  - 価格比較ガイド（JPY換算）
-  - 業務別選択フロー図
+  - Claude Japanese Features Guide
+  - ChatGPT Plus Complete Guide
+  - Pricing Comparison Guide (in JPY)
+  - Workflow Selection by Task
 
 ### Hub 2: Best AI Tools for Japan
-- ✅ **Core Article**: "Best AI Tools for Japan 2026: Complete Guide" (PUBLISHED)
+- ✅ **Core Article**: Best AI Tools for Japan 2026: Complete Guide (PUBLISHED)
 - Supporting content:
   - Top 10 AI Tools (Extended version)
   - Remote Work AI Stack
-  - 業種別おすすめツール
-  - 無料 vs 有料ツール比較
+  - Recommended Tools by Industry
+  - Free vs Paid Tools Comparison
 
 ### Hub 3: AI Tools by Use Case
-- AI ライティング・コンテンツ作成ツール
-- AI プログラミング支援ツール
-- AI 翻訳・言語ツール
-- AI 画像生成ツール 日本
-- ビジネス分析用 AI ツール
+- AI Writing and Content Creation Tools
+- AI Programming Assistance Tools
+- AI Translation and Language Tools
+- AI Image Generation Tools Japan
+- Business Analysis AI Tools
 
 ### Hub 4: Product Deep Dives
-- Claude 完全ガイド （日本語対応、料金、API）
-- ChatGPT 2026年 完全ガイド
-- Gemini 初心者向けガイド
-- Perplexity AI 使い方ガイド
+- Claude Complete Guide (Japanese support, pricing, API)
+- ChatGPT 2026 Complete Guide
+- Gemini Beginner's Guide
+- Perplexity AI Usage Guide
 
 ---
 
@@ -187,22 +187,22 @@ Dominated by major sites, but high volume:
 - ✅ Monetization Strategy (DONE)
 
 **Week 3-4**:
-- Claude 日本語 機能ガイド [Low difficulty]
-- AI ツール 無料 vs 有料比較 [Low difficulty]
+- Claude Japanese Features Guide [Low difficulty]
+- Free vs Paid AI Tools Comparison [Low difficulty]
 
 ### Month 2 (May): Quick Wins
 
-- ChatGPT Plus 完全ガイド [Medium]
-- AI ライティング ツール 5選 [Medium]
-- Gemini AI 日本語ガイド [Low]
-- Claude API セットアップガイド [Low]
+- ChatGPT Plus Complete Guide [Medium]
+- Top 5 AI Writing Tools [Medium]
+- Gemini AI Japanese Guide [Low]
+- Claude API Setup Guide [Low]
 
 ### Month 3 (June): Authority Building
 
-- ビジネス向け AI ツール完全ガイド [High]
-- AI 導入企業事例（Japanese companies）[Medium]
-- リモートワーク AI スタック [Medium]
-- AI プログラミング支援ツール比較 [Medium]
+- Complete Business AI Tools Guide [High]
+- AI Adoption Case Studies [Medium]
+- Remote Work AI Stack [Medium]
+- AI Programming Tools Comparison [Medium]
 
 ---
 
@@ -212,22 +212,21 @@ Dominated by major sites, but high volume:
 
 Primary keyword often appears in 3-5 variations:
 
-**Example: "Claude vs ChatGPT"**
-- Claude ChatGPT 比較
-- Claude と ChatGPT の違い
-- Claude ChatGPT どちらがいい
-- Claude vs ChatGPT 日本
+**Example: Claude vs ChatGPT**
+- Claude ChatGPT comparison
+- Difference between Claude and ChatGPT
+- Which is better, Claude or ChatGPT
+- Claude vs ChatGPT Japan
 - Claude vs ChatGPT 2026
 
 **Strategy**: Use primary keyword in H1, include variations naturally in body text. Schema markup helps Google understand variations.
 
-### Kanji vs Hiragana
+### Language and Writing Style
 
-- AI ツール (preferred, easier to read)
-- あい ツール (rarely searched)
-- 人工知能 ツール (older generation, lower volume)
+- AI tools (preferred, easier to read)
+- Artificial intelligence tools (older terms, lower volume)
 
-**Rule**: Use katakana "AI" for modern appeal, "人工知能" only in educational contexts
+**Rule**: Use "AI" in English for modern appeal
 
 ---
 
@@ -235,14 +234,14 @@ Primary keyword often appears in 3-5 variations:
 
 ### Where to Get Backlinks (Japan-focused)
 
-1. **Japanese Tech Blogs**: マイナビテック、ITmedia、ZDNET Japan
+1. **Japanese Tech Blogs**: Mynavi Tech, ITmedia, ZDNET Japan
    - Outreach: "Here's our comprehensive AI tools guide, thought you might find useful"
    
 2. **Reddit Japanese Communities**: r/Japan, r/LearnJapanese, r/RemoteWork
    - Share articles naturally in relevant discussions
    
 3. **Japanese Social Media**:
-   - Twitter/X: Relevant hashtags (#AI #日本 #チャットボット)
+   - Twitter/X: Relevant hashtags (#AI #Japan #Chatbot)
    - LinkedIn: B2B audience, business professionals
    
 4. **Business/Expat Communities**:
@@ -252,7 +251,7 @@ Primary keyword often appears in 3-5 variations:
 5. **Japanese SEO Directories**:
    - Navi Plus Japan
    - SEOmoz Japan directory
-   - Yotube (Japanese equivalent of Dmoz)
+   - Yotube (Japanese equivalent of DMOZ)
 
 ### Link Building Timeline
 
@@ -266,7 +265,7 @@ Primary keyword often appears in 3-5 variations:
 
 ### Who's Already Ranking?
 
-**Current Top 3 for "Claude ChatGPT 比較"**:
+**Current Top 3 for Claude vs ChatGPT Comparison**:
 1. OpenAI Japan Official Blog
 2. Anthropic Japan Documentation
 3. TechCrunch Japan
@@ -299,20 +298,20 @@ Low Volume       B (Foundation) |  D (Skip)
 ```
 
 **Priority A** (Target immediately):
-- AI ツール 2026 おすすめ (High volume, medium difficulty)
-- Claude ChatGPT 比較 (High volume, medium difficulty)
+- AI Tools 2026 Recommendations (High volume, medium difficulty)
+- Claude ChatGPT Comparison (High volume, medium difficulty)
 
 **Priority B** (Build foundation):
-- Claude 日本語 (Low difficulty)
-- Gemini AI 日本語 (Low difficulty)
-- AI ツール 無料 (Low difficulty)
+- Claude Japanese (Low difficulty)
+- Gemini AI Japanese (Low difficulty)
+- Free AI Tools (Low difficulty)
 
 **Priority C** (Long-term growth):
-- ビジネス向け AI ツール (High volume, high difficulty)
-- AI 導入トレンド (High volume, high difficulty)
+- Business AI Tools (High volume, high difficulty)
+- AI Adoption Trends (High volume, high difficulty)
 
 **Priority D** (Skip for now):
-- 一般的な "AI ツール" (Too broad, too competitive)
+- General "AI tools" (Too broad, too competitive)
 - "ChatGPT" alone (Impossible to rank)
 
 ---

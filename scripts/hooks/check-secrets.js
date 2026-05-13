@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * PreToolUse hook: git commit前にシークレットを検出
- * .env内容、APIキー、トークンがステージングに含まれていないか確認
+ * PreToolUse hook: Detect secrets before git commit
+ * Verify that .env content, API keys, and tokens are not in staging
  */
 const { execSync } = require('child_process')
 
@@ -26,7 +26,7 @@ const SENSITIVE_FILES = [
 ]
 
 function main() {
-  // stdin からツール入力を受け取る
+  // Receive tool input from stdin
   let input = ''
   try {
     input = require('fs').readFileSync(0, 'utf-8')
@@ -41,38 +41,38 @@ function main() {
     process.exit(0)
   }
 
-  // Bash の git commit コマンドのみチェック
+  // Check only git commit commands from Bash
   if (!toolInput.tool_input?.command?.includes('git commit')) {
     process.exit(0)
   }
 
-  // ステージングされたファイルを確認
+  // Check staged files
   try {
     const staged = execSync('git diff --cached --name-only', { cwd: process.env.PWD || '.' })
       .toString().trim().split('\n').filter(Boolean)
 
-    // 機密ファイルチェック
+    // Check for sensitive files
     for (const file of staged) {
       for (const pattern of SENSITIVE_FILES) {
         if (pattern.test(file)) {
-          console.error(`⚠️ 機密ファイルがステージされています: ${file}`)
-          console.error('git reset HEAD ' + file + ' でアンステージしてください')
+          console.error(`⚠️ Sensitive file is staged: ${file}`)
+          console.error('Unstage with: git reset HEAD ' + file)
           process.exit(2)
         }
       }
     }
 
-    // ステージされたdiffの中身をチェック
+    // Check staged diff content
     const diff = execSync('git diff --cached', { cwd: process.env.PWD || '.' }).toString()
     for (const pattern of SECRET_PATTERNS) {
       if (pattern.test(diff)) {
-        console.error(`⚠️ シークレットらしき値がdiffに含まれています: ${pattern}`)
-        console.error('コミット前に確認してください')
+        console.error(`⚠️ Possible secret found in diff: ${pattern}`)
+        console.error('Please verify before committing')
         process.exit(2)
       }
     }
   } catch {
-    // git コマンド失敗は無視
+    // Ignore git command failures
   }
 
   process.exit(0)
