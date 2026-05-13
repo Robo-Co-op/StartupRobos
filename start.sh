@@ -174,6 +174,16 @@ fi
 # ---------------------------------------------------------------------------
 # 6. Backup existing .env.local and write new one
 # ---------------------------------------------------------------------------
+# Strip newlines to prevent heredoc injection attacks
+SUPABASE_URL="${SUPABASE_URL//$'\n'/}"
+SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY//$'\n'/}"
+SERVICE_ROLE_KEY="${SERVICE_ROLE_KEY//$'\n'/}"
+ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY//$'\n'/}"
+RESEND_API_KEY="${RESEND_API_KEY//$'\n'/}"
+NOTIFY_EMAIL="${NOTIFY_EMAIL//$'\n'/}"
+UPSTASH_REDIS_REST_URL="${UPSTASH_REDIS_REST_URL//$'\n'/}"
+UPSTASH_REDIS_REST_TOKEN="${UPSTASH_REDIS_REST_TOKEN//$'\n'/}"
+
 ENV_FILE="$TARGET_DIR/.env.local"
 
 # Backup existing .env.local if it exists
