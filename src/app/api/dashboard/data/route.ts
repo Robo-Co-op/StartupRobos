@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/client'
+import { requireApiAuth } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
+  const authError = requireApiAuth(req)
+  if (authError) return authError
+
   const userId = req.headers.get('x-user-id')
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const supabase = createServiceClient()
 
   // startups を先に取得し、そのIDで experiments をフィルタ（IDOR防止）

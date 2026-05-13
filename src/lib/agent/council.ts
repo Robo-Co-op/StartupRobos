@@ -1,10 +1,13 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { CXO_SYSTEM_PROMPTS, CXO_MODELS, type CXORole } from './cxo'
-import { deductBudget, BudgetExhaustedError } from '@/lib/agent/budgetDeduction'
+import { extractText } from './responseSchemas'
+import { checkBudgetPreFlight, deductBudget, BudgetExhaustedError } from '@/lib/agent/budgetDeduction'
 import { calcCost } from '@/lib/agent/costs'
 
-// 最低予算: CXO 4名 (sonnet) + CEO (opus) の概算上限
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
+
+// Minimum budget: estimated upper bound for CXO 4 (sonnet) + CEO (opus)
 const MIN_BUDGET_USD = 0.10
 
 export interface CouncilResult {
@@ -35,24 +38,12 @@ export async function runCouncil(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: SupabaseClient<any, any, any>
 ): Promise<CouncilResult> {
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
+  // Atomic budget check via RPC
+  await checkBudgetPreFlight(supabase, userId, MIN_BUDGET_USD)
 
-  // 予算チェック
-  const { data: budget, error: budgetError } = await supabase
-    .from('token_budgets')
-    .select('spent_usd, total_usd')
-    .eq('user_id', userId)
-    .single()
+  const userMessage = `## Startup Context\n${startupContext}\n\n## Agenda\n${agenda}`
 
-  if (budgetError || !budget) throw new Error('予算情報が見つかりません')
-  const remainingUsd = Number(budget.total_usd) - Number(budget.spent_usd)
-  if (remainingUsd < MIN_BUDGET_USD) {
-    throw new BudgetExhaustedError(`トークン予算が不足しています (残: $${remainingUsd.toFixed(4)})`)
-  }
-
-  const userMessage = `## スタートアップコンテキスト\n${startupContext}\n\n## アジェンダ\n${agenda}`
-
-  // Step 1: CTO / CMO / COO / CFO を並列実行
+  // Step 1: CTO / CMO / COO / CFO in parallel
   const subordinateRoles: Exclude<CXORole, 'ceo'>[] = ['cto', 'cmo', 'coo', 'cfo']
 
   const reports: CXOReport[] = await Promise.all(
@@ -64,7 +55,7 @@ export async function runCouncil(
         system: CXO_SYSTEM_PROMPTS[role],
         messages: [{ role: 'user', content: userMessage }],
       })
-      const content = response.content[0].type === 'text' ? response.content[0].text : ''
+      const content = extractText(response)
       const costUsd = calcCost(model, response.usage.input_tokens, response.usage.output_tokens)
       return { role, content, costUsd, tokensIn: response.usage.input_tokens, tokensOut: response.usage.output_tokens }
     })
@@ -72,14 +63,14 @@ export async function runCouncil(
 
   const byRole = Object.fromEntries(reports.map(r => [r.role, r])) as Record<Exclude<CXORole, 'ceo'>, CXOReport>
 
-  // Step 2: CEO が全レポートを統合して意思決定
+  // Step 2: CEO synthesizes all CXO reports
   const ceoPrompt = [
-    `## スタートアップコンテキスト\n${startupContext}`,
-    `## アジェンダ\n${agenda}`,
-    `## CTO レポート\n${byRole.cto.content}`,
-    `## CMO レポート\n${byRole.cmo.content}`,
-    `## COO レポート\n${byRole.coo.content}`,
-    `## CFO レポート\n${byRole.cfo.content}`,
+    `## Startup Context\n${startupContext}`,
+    `## Agenda\n${agenda}`,
+    `## CTO Report\n${byRole.cto.content}`,
+    `## CMO Report\n${byRole.cmo.content}`,
+    `## COO Report\n${byRole.coo.content}`,
+    `## CFO Report\n${byRole.cfo.content}`,
   ].join('\n\n')
 
   const ceoModel = CXO_MODELS['ceo']
@@ -89,12 +80,12 @@ export async function runCouncil(
     system: CXO_SYSTEM_PROMPTS['ceo'],
     messages: [{ role: 'user', content: ceoPrompt }],
   })
-  const ceoDecision = ceoResponse.content[0].type === 'text' ? ceoResponse.content[0].text : ''
+  const ceoDecision = extractText(ceoResponse)
   const ceoCostUsd = calcCost(ceoModel, ceoResponse.usage.input_tokens, ceoResponse.usage.output_tokens)
 
   const totalCostUsd = reports.reduce((sum, r) => sum + r.costUsd, 0) + ceoCostUsd
 
-  // 実行ログを一括挿入
+  // Batch insert execution logs
   await supabase.from('agent_runs').insert([
     ...reports.map(r => ({
       user_id: userId,
@@ -118,9 +109,9 @@ export async function runCouncil(
 
   // アトミックに予算控除（TOCTOU 競合を排除）
   const deduction = await deductBudget(supabase, userId, totalCostUsd)
-  if (!deduction.ok) throw new BudgetExhaustedError('トークン予算が不足しています（並列控除で上限超過）')
+  if (!deduction.ok) throw new BudgetExhaustedError('Token budget exhausted (concurrent deduction exceeded limit)')
 
-  // CXOセッション保存
+  // Save CXO session
   const { data: session } = await supabase
     .from('cxo_sessions')
     .insert({

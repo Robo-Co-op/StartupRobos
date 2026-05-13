@@ -1,31 +1,13 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* Radix UI Themes provides the base color system (slate + blue).
+   We only add a few global bits here (scrollbar, legacy helpers). */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #09090b;
-    --foreground: #fafafa;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
+html, body {
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
 }
 
-/* スクロールバー */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -34,135 +16,25 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: var(--slate-5);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: var(--slate-6);
 }
 
-/* アニメーション */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 4px rgba(168, 85, 247, 0.3); }
-  50% { box-shadow: 0 0 12px rgba(168, 85, 247, 0.5); }
+/* Subtle row hover for Linear-like lists */
+.nav-link:hover {
+  background: var(--slate-3) !important;
+  color: var(--slate-12) !important;
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out both;
-}
-.animate-pulse-dot {
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-.animate-shimmer {
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
-  background-size: 200% 100%;
-  animation: shimmer 3s linear infinite;
-}
-.animate-glow {
-  animation: glow 3s ease-in-out infinite;
-}
-
-/* カード共通 */
+/* Legacy classes (retained only while old components migrate) */
 .card {
-  background: #0a0a0c;
-  border: 1px solid #1c1c22;
-  border-radius: 12px;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  background: var(--slate-1);
+  border: 1px solid var(--slate-4);
+  border-radius: 8px;
 }
 .card:hover {
-  border-color: #2a2a32;
-  background: #0e0e12;
-}
-
-/* サイドバーアクティブ */
-.nav-active {
-  background: rgba(168, 85, 247, 0.08);
-  color: #e9d5ff;
-  border-left: 2px solid #a855f7;
-}
-
-/* ステータスドット */
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.status-running { background: #22c55e; }
-.status-blocked { background: #ef4444; }
-.status-done { background: #3b82f6; }
-.status-idle { background: #52525b; }
-.status-review { background: #f59e0b; }
-
-/* CRT レトロテーマ（toggle で body に .theme-crt を付ける） */
-.theme-crt {
-  font-family: var(--font-geist-mono), 'IBM Plex Mono', 'Courier New', monospace !important;
-}
-.theme-crt::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 50;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent 0,
-    transparent 2px,
-    rgba(168, 85, 247, 0.04) 2px,
-    rgba(168, 85, 247, 0.04) 3px
-  );
-}
-.theme-crt::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 51;
-  background: radial-gradient(
-    ellipse at center,
-    transparent 40%,
-    rgba(0, 0, 0, 0.4) 100%
-  );
-  mix-blend-mode: multiply;
-}
-.theme-crt .card {
-  border-color: rgba(168, 85, 247, 0.3) !important;
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.1), inset 0 0 1px rgba(168, 85, 247, 0.2);
-}
-.theme-crt .card:hover {
-  border-color: rgba(168, 85, 247, 0.6) !important;
-  box-shadow: 0 0 24px rgba(168, 85, 247, 0.25), inset 0 0 2px rgba(168, 85, 247, 0.3);
-}
-.theme-crt h1,
-.theme-crt h2,
-.theme-crt h3 {
-  text-shadow: 0 0 8px rgba(168, 85, 247, 0.6);
-  letter-spacing: 0.04em;
-}
-.theme-crt aside {
-  border-right-color: rgba(168, 85, 247, 0.4) !important;
-}
-
-/* スキャンラインフリッカー */
-@keyframes flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.97; }
-  52% { opacity: 0.95; }
-  54% { opacity: 1; }
-}
-.theme-crt body,
-.theme-crt > * {
-  animation: flicker 0.15s infinite;
+  border-color: var(--slate-5);
 }

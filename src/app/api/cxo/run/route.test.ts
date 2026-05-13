@@ -35,6 +35,9 @@ vi.mock('@/lib/rateLimit', () => ({
 vi.mock('@/lib/startup/config', () => ({
   MAX_PIVOTS: 3,
 }))
+vi.mock('@/lib/auth', () => ({
+  requireApiAuth: () => null,
+}))
 
 import { POST } from './route'
 import { runCouncil } from '@/lib/agent/council'

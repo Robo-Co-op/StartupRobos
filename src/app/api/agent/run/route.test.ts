@@ -25,6 +25,9 @@ vi.mock('@/lib/security/piiMasker', () => ({
 vi.mock('@/lib/rateLimit', () => ({
   makeRateLimiter: () => async () => true,
 }))
+vi.mock('@/lib/auth', () => ({
+  requireApiAuth: () => null,
+}))
 
 import { POST } from './route'
 import { runAgent } from '@/lib/agent/harness'

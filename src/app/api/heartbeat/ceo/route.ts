@@ -2,22 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createServiceClient } from '@/lib/supabase/client'
 import { sendReport } from '@/lib/notify'
+import { requireCronAuth } from '@/lib/auth'
 import { calcCost } from '@/lib/agent/costs'
+import { extractText } from '@/lib/agent/responseSchemas'
+
+// CEO heartbeat calls Opus which can be slow
+export const maxDuration = 300
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
-// Vercel Cron sends Authorization: Bearer {CRON_SECRET}
-function isAuthorized(req: NextRequest) {
-  const secret = process.env.CRON_SECRET
-  if (!secret) return false
-  const auth = req.headers.get('authorization')
-  return auth === `Bearer ${secret}`
-}
-
 export async function GET(req: NextRequest) {
-  if (!isAuthorized(req)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const authError = requireCronAuth(req)
+  if (authError) return authError
 
   const supabase = createServiceClient()
 
@@ -61,7 +57,7 @@ For each business:
     system: 'You are an experienced startup CEO. Make concise and specific decisions based on data.',
   })
 
-  const content = response.content[0].type === 'text' ? response.content[0].text : ''
+  const content = extractText(response)
   const costUsd = calcCost('claude-opus-4-6', response.usage.input_tokens, response.usage.output_tokens)
 
   // Save execution log to Supabase

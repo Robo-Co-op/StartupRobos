@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/client'
+import { requireApiAuth } from '@/lib/auth'
 import { maskPII } from '@/lib/security/piiMasker'
 import { MAX_PIVOTS } from '@/lib/startup/config'
 import { z } from 'zod'
@@ -13,6 +14,9 @@ const requestSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
+  const authError = requireApiAuth(req)
+  if (authError) return authError
+
   const userId = req.headers.get('x-user-id')
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createServiceClient } from '@/lib/supabase/client'
+import { requireCronAuth } from '@/lib/auth'
 import { calcCost } from '@/lib/agent/costs'
+import { extractText } from '@/lib/agent/responseSchemas'
+
+// CXO heartbeat runs 5 sequential AI calls
+export const maxDuration = 300
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
-
-function isAuthorized(req: NextRequest) {
-  const secret = process.env.CRON_SECRET
-  if (!secret) return false
-  const auth = req.headers.get('authorization')
-  return auth === `Bearer ${secret}`
-}
 
 // Business-specific CXO tasks (CMO + CTO)
 const BUSINESS_TASKS: Record<string, { role: string; prompt: string; task_type: string }> = {
@@ -65,9 +63,8 @@ Report on:
 ]
 
 export async function GET(req: NextRequest) {
-  if (!isAuthorized(req)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const authError = requireCronAuth(req)
+  if (authError) return authError
 
   const supabase = createServiceClient()
 
@@ -95,7 +92,7 @@ export async function GET(req: NextRequest) {
       system: `You are the ${task.role} of Launchpad. Provide actionable and specific recommendations.`,
     })
 
-    const content = response.content[0].type === 'text' ? response.content[0].text : ''
+    const content = extractText(response)
     const costUsd = calcCost('claude-sonnet-4-6', response.usage.input_tokens, response.usage.output_tokens)
     totalCost += costUsd
 
@@ -121,7 +118,7 @@ export async function GET(req: NextRequest) {
       system: `You are the ${task.role} of Launchpad. Provide actionable and specific recommendations.`,
     })
 
-    const content = response.content[0].type === 'text' ? response.content[0].text : ''
+    const content = extractText(response)
     const costUsd = calcCost('claude-sonnet-4-6', response.usage.input_tokens, response.usage.output_tokens)
     totalCost += costUsd
 

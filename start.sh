@@ -10,88 +10,6 @@ echo "  ========================================"
 echo ""
 
 # ---------------------------------------------------------------------------
-# Helper: Get value from env.staff (safe parsing, no sourcing)
-# ---------------------------------------------------------------------------
-get_staff_value() {
-  local key="$1"
-  if [ -f "env.staff" ]; then
-    while IFS= read -r line || [[ -n "$line" ]]; do
-      [[ -z "$line" ]] && continue
-      [[ "$line" != *"="* ]] && continue
-      local k="${line%%=*}"
-      local v="${line#*=}"
-      if [[ "$k" == "$key" ]]; then
-        echo "$v"
-        return
-      fi
-    done < "env.staff"
-  fi
-  echo ""
-}
-
-# ---------------------------------------------------------------------------
-# Helper: Prompt with optional staff default
-# ---------------------------------------------------------------------------
-prompt_with_default() {
-  local prompt_text="$1"
-  local var_name="$2"
-  local result=""
-  local default_value
-  default_value=$(get_staff_value "$var_name")
-
-  if [[ -n "$default_value" ]]; then
-    local masked
-    if [[ "$default_value" == eyJ* ]]; then
-      masked="[set]"
-    else
-      masked="${default_value:0:4}..."
-    fi
-    echo -n "  $prompt_text (default: $masked): " >&2
-  else
-    echo -n "  $prompt_text: " >&2
-  fi
-
-  read -r result </dev/tty
-
-  if [[ -z "$result" && -n "$default_value" ]]; then
-    echo "$default_value"
-  else
-    echo "$result"
-  fi
-}
-
-# ---------------------------------------------------------------------------
-# Helper: Prompt for optional value (press Enter to skip)
-# ---------------------------------------------------------------------------
-prompt_optional() {
-  local prompt_text="$1"
-  local var_name="$2"
-  local result=""
-  local default_value
-  default_value=$(get_staff_value "$var_name")
-
-  if [[ -n "$default_value" ]]; then
-    local masked
-    if [[ "$default_value" == eyJ* ]]; then
-      masked="[set]"
-    else
-      masked="${default_value:0:4}..."
-    fi
-    echo -n "  $prompt_text (default: $masked, Enter to skip): " >&2
-  else
-    echo -n "  $prompt_text (press Enter to skip): " >&2
-  fi
-
-  read -r result </dev/tty
-
-  if [[ -z "$result" && -n "$default_value" ]]; then
-    echo "$default_value"
-  else
-    echo "$result"
-  fi
-}
-
-# ---------------------------------------------------------------------------
 # 1. Check required tools: git, node, npm
 # ---------------------------------------------------------------------------
 for cmd in git node npm; do
@@ -109,7 +27,7 @@ if ! command -v claude &>/dev/null; then
   echo "  Claude Code CLI is required."
   echo "  Install: npm install -g @anthropic-ai/claude-code@1"
   echo ""
-  read -r -p "  Install now? (y/n): " install_cc </dev/tty
+  read -r -p "  Install now? (y/n): " install_cc </dev/tty || true
   if [[ "$install_cc" == "y" || "$install_cc" == "Y" ]]; then
     npm install -g @anthropic-ai/claude-code@1
   else
@@ -131,57 +49,131 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 3b. Install robobuilder to ~/.claude/plugins/
+# 3b. Install robobuilder into plugins directory (platform-aware)
 # ---------------------------------------------------------------------------
-# Pin: update this SHA when intentionally upgrading robobuilder
-ROBOBUILDER_REF="main"  # TODO: replace with a pinned commit SHA e.g. "abc1234"
+ROBOBUILDER_REF="090cf126c40c92f8dd2e2b7e32b9cf835dadeafd"
 
-PLUGINS_DIR="$HOME/.claude/plugins"
+# Detect platform and set plugins path accordingly
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*)
+    # Native Windows (Git Bash / MSYS2 / Cygwin)
+    if [ -n "${APPDATA:-}" ]; then
+      PLUGINS_DIR="$APPDATA/claude/plugins"
+    else
+      PLUGINS_DIR="$HOME/.claude/plugins"
+    fi
+    ;;
+  *)
+    # Linux, macOS, WSL (all use ~/.claude/plugins/)
+    PLUGINS_DIR="$HOME/.claude/plugins"
+    ;;
+esac
+
 ROBOBUILDER_DIR="$PLUGINS_DIR/robobuilder"
 
 mkdir -p "$PLUGINS_DIR"
 
-if [ -d "$ROBOBUILDER_DIR/.git" ]; then
+if [ -d "$ROBOBUILDER_DIR" ]; then
   echo "  Updating robobuilder..."
-  if ! git -C "$ROBOBUILDER_DIR" fetch --quiet origin 2>/dev/null; then
-    echo "  Warning: robobuilder fetch failed (skipping update)"
-  else
-    git -C "$ROBOBUILDER_DIR" checkout --quiet "$ROBOBUILDER_REF" 2>/dev/null || \
-      echo "  Warning: robobuilder checkout $ROBOBUILDER_REF failed (skipping)"
-  fi
+  git -C "$ROBOBUILDER_DIR" fetch origin 2>/dev/null \
+    && git -C "$ROBOBUILDER_DIR" checkout "$ROBOBUILDER_REF" 2>/dev/null \
+    || echo "  WARNING: robobuilder update skipped. Continuing."
 else
   echo "  Installing robobuilder..."
-  if git clone --depth 1 https://github.com/Robo-Co-op/robobuilder.git "$ROBOBUILDER_DIR" 2>/dev/null; then
-    git -C "$ROBOBUILDER_DIR" checkout --quiet "$ROBOBUILDER_REF" 2>/dev/null || \
-      echo "  Warning: robobuilder checkout $ROBOBUILDER_REF failed"
-  else
-    echo "  Warning: robobuilder clone failed"
-  fi
+  git clone https://github.com/Robo-Co-op/robobuilder.git "$ROBOBUILDER_DIR" 2>/dev/null \
+    && git -C "$ROBOBUILDER_DIR" checkout "$ROBOBUILDER_REF" 2>/dev/null \
+    || echo "  WARNING: robobuilder install failed. Continuing."
 fi
 
 # ---------------------------------------------------------------------------
-# 4. Prompt for required credentials
+# 4. Parse env.staff (line-by-line; never source to avoid shell injection)
+# ---------------------------------------------------------------------------
+declare -A STAFF_VALS
+
+if [ -f "env.staff" ]; then
+  while IFS= read -r line || [ -n "$line" ]; do
+    # Skip empty lines and comments
+    [[ -z "$line" ]] && continue
+    [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    # Require KEY=VALUE format; silently skip malformed lines
+    if [[ "$line" == *=* ]]; then
+      key="${line%%=*}"
+      val="${line#*=}"
+      STAFF_VALS["$key"]="$val"
+    fi
+  done < "env.staff"
+fi
+
+# ---------------------------------------------------------------------------
+# Helper: prompt for a REQUIRED value (loops until non-empty)
+# Shows masked staff default when available.
+# ---------------------------------------------------------------------------
+prompt_required() {
+  local key="$1"
+  local label="$2"
+  local result=""
+  local staff_val="${STAFF_VALS[$key]:-}"
+
+  if [ -n "$staff_val" ]; then
+    local masked="${staff_val:0:8}..."
+    read -r -p "  $label (default: $masked): " result </dev/tty || true
+    if [ -z "$result" ]; then
+      result="$staff_val"
+    fi
+  else
+    while [ -z "$result" ]; do
+      read -r -p "  $label: " result </dev/tty || true
+    done
+  fi
+
+  printf '%s' "$result"
+}
+
+# ---------------------------------------------------------------------------
+# Helper: prompt for an OPTIONAL value (empty = skip)
+# ---------------------------------------------------------------------------
+prompt_optional() {
+  local key="$1"
+  local label="$2"
+  local result=""
+  local staff_val="${STAFF_VALS[$key]:-}"
+
+  if [ -n "$staff_val" ]; then
+    local masked="${staff_val:0:8}..."
+    read -r -p "  $label (press Enter to skip, default: $masked): " result </dev/tty || true
+    if [ -z "$result" ]; then
+      result="$staff_val"
+    fi
+  else
+    read -r -p "  $label (press Enter to skip): " result </dev/tty || true
+  fi
+
+  printf '%s' "$result"
+}
+
+# ---------------------------------------------------------------------------
+# Prompt for required credentials
 # ---------------------------------------------------------------------------
 echo ""
 echo "  Enter your credentials:"
 echo ""
 
-SUPABASE_URL=$(prompt_with_default "Supabase URL" "NEXT_PUBLIC_SUPABASE_URL")
-SUPABASE_ANON_KEY=$(prompt_with_default "Supabase Anon Key" "NEXT_PUBLIC_SUPABASE_ANON_KEY")
-SERVICE_ROLE_KEY=$(prompt_with_default "Supabase Service Role Key" "SUPABASE_SERVICE_ROLE_KEY")
-ANTHROPIC_API_KEY=$(prompt_with_default "Anthropic API Key" "ANTHROPIC_API_KEY")
+SUPABASE_URL=$(prompt_required "NEXT_PUBLIC_SUPABASE_URL" "Supabase URL")
+SUPABASE_ANON_KEY=$(prompt_required "NEXT_PUBLIC_SUPABASE_ANON_KEY" "Supabase Anon Key")
+SERVICE_ROLE_KEY=$(prompt_required "SUPABASE_SERVICE_ROLE_KEY" "Supabase Service Role Key")
+ANTHROPIC_API_KEY=$(prompt_required "ANTHROPIC_API_KEY" "Anthropic API Key")
 
 # ---------------------------------------------------------------------------
-# 4b. Prompt for optional credentials
+# Optional integrations
 # ---------------------------------------------------------------------------
 echo ""
-echo "  Optional credentials (press Enter to skip):"
+echo "  Optional integrations:"
 echo ""
 
-RESEND_API_KEY=$(prompt_optional "Resend API Key" "RESEND_API_KEY")
-NOTIFY_EMAIL=$(prompt_optional "Notify Email" "NOTIFY_EMAIL")
-UPSTASH_REDIS_REST_URL=$(prompt_optional "Upstash Redis REST URL" "UPSTASH_REDIS_REST_URL")
-UPSTASH_REDIS_REST_TOKEN=$(prompt_optional "Upstash Redis REST Token" "UPSTASH_REDIS_REST_TOKEN")
+RESEND_API_KEY=$(prompt_optional "RESEND_API_KEY" "Resend API Key")
+NOTIFY_EMAIL=$(prompt_optional "NOTIFY_EMAIL" "Notify Email")
+UPSTASH_REDIS_REST_URL=$(prompt_optional "UPSTASH_REDIS_REST_URL" "Upstash Redis REST URL")
+UPSTASH_REDIS_REST_TOKEN=$(prompt_optional "UPSTASH_REDIS_REST_TOKEN" "Upstash Redis REST Token")
 
 # ---------------------------------------------------------------------------
 # 5. Generate CRON_SECRET
@@ -193,7 +185,7 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 6. Backup existing .env.local and write new one
+# 6. Write .env.local (backup existing)
 # ---------------------------------------------------------------------------
 # Strip newlines to prevent heredoc injection attacks
 SUPABASE_URL="${SUPABASE_URL//$'\n'/}"
@@ -207,10 +199,9 @@ UPSTASH_REDIS_REST_TOKEN="${UPSTASH_REDIS_REST_TOKEN//$'\n'/}"
 
 ENV_FILE="$TARGET_DIR/.env.local"
 
-# Backup existing .env.local if it exists
 if [ -f "$ENV_FILE" ]; then
   cp "$ENV_FILE" "$ENV_FILE.bak"
-  echo "  Existing .env.local backed up to .env.local.bak"
+  echo "  Backed up existing .env.local to .env.local.bak"
 fi
 
 cat > "$ENV_FILE" <<ENV
@@ -235,11 +226,13 @@ echo "  .env.local written."
 echo "  Installing dependencies..."
 npm install --prefix "$TARGET_DIR"
 
-cd "$TARGET_DIR"
-
+# ---------------------------------------------------------------------------
+# 8. Launch Claude Code
+# ---------------------------------------------------------------------------
 echo ""
 echo "  ========================================"
 echo "  Ready! Launching Claude Code..."
 echo ""
 
+cd "$TARGET_DIR"
 exec claude

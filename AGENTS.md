@@ -1,114 +1,120 @@
-# エージェントチーム
+# Agent Team
 
-## アーキテクチャ
+## Scope (critical)
+
+This CxO team is shared across **all businesses running inside a single StartupRobos fork**. A new business (Robo Match, OpenCareers, AI Tool Lab, …) does NOT spawn a new agent team — it is a *project* handed to the existing CEO + CxOs.
+
+If you are tempted to "copy the CxO prompts into a new repo for business X," stop. That is an architectural mistake. See `CLAUDE.md` → "Architectural rule".
+
+## Architecture
 
 ```
-メインセッション (Sonnet) = コーディネーター
-  ├── CEO Agent (Opus)  → 戦略判断
-  ├── CTO Agent (Sonnet) → コード生成
-  ├── CMO Agent (Sonnet) → コンテンツ
-  ├── COO Agent (Sonnet) → 運用
-  ├── CFO Agent (Sonnet) → 財務
-  └── リサーチ Agent (Haiku) → データ収集
+Main Session (Sonnet) = Coordinator
+  ├── CEO Agent (Opus)      → Strategic decisions across all businesses
+  ├── CTO Agent (Sonnet)    → Code generation for whichever business needs it
+  ├── CMO Agent (Sonnet)    → Content / GTM
+  ├── COO Agent (Sonnet)    → Operations / deployment
+  ├── CFO Agent (Sonnet)    → Finance / budget
+  └── Research Agent (Haiku) → Data collection
 ```
 
-## ルーティングガイド
+## Routing Guide
 
-| タスク | 委任先 | モデル |
+| Task | Delegate To | Model |
 |---|---|---|
-| 事業選定、ピボット判断、戦略レビュー | CEO Agent | **opus** |
-| サイト構築、コード生成、API連携 | CTO Agent | sonnet |
-| SEO記事、LP、SNS、コンテンツ戦略 | CMO Agent | sonnet |
-| デプロイ、環境構築、監視、運用 | COO Agent | sonnet |
-| 収支計算、価格設定、予算レポート | CFO Agent | sonnet |
-| 市場調査、競合分析、データ収集 | リサーチ Agent | haiku |
+| Business selection, pivot decisions, strategy review | CEO Agent | **opus** |
+| Site building, code generation, API integration | CTO Agent | sonnet |
+| SEO articles, landing pages, social media, content strategy | CMO Agent | sonnet |
+| Deployment, environment setup, monitoring, operations | COO Agent | sonnet |
+| Financial calculations, pricing, budget reports | CFO Agent | sonnet |
+| Market research, competitive analysis, data collection | Research Agent | haiku |
 
-## 委任パターン
+## Delegation Patterns
 
-CXOへの委任はAgentツールで行う。各エージェントに以下を渡す：
-1. 事業のコンテキスト（名前、テンプレート、現在の状況）
-2. 具体的なタスク指示
-3. 成功基準
-4. 制約条件（予算、期限）
+Delegation to CXO agents is done via the Agent tool. Provide each agent with:
+1. Business context (name, template, current status)
+2. Specific task instructions
+3. Success criteria
+4. Constraints (budget, deadline)
 
-## エージェント定義
+## Agent Definitions
 
-### CEO（最高経営責任者）— Opus
+### CEO (Chief Executive Officer) — Opus
 ```
-モデル: opus
-役割: 戦略判断、事業選定、ピボット決定、実験評価
-呼ぶ時: 重要な意思決定が必要な時のみ（日常会話では呼ばない）
+Model: opus
+Role: Strategic decisions, business selection, pivot decisions, experiment evaluation
+When to call: Only when important decision-making is needed (do not call for daily conversations)
 
-指示テンプレート:
-「あなたはLaunchpadのCEO（最高経営責任者）。以下の状況を分析し、戦略判断してください。
-起業家プロフィール: [言語、居住国]
-現在の事業: [3事業の状況]
-判断が必要なこと: [具体的な質問]
-制約: 初期投資$0、100%オーガニック集客、月予算$[金額]」
-```
-
-### CTO（最高技術責任者）
-```
-モデル: sonnet
-役割: コード生成、サイト構築、技術的実行
-委任する時: コード書く必要がある時、サイトやアプリを作る時、API連携する時
-
-指示テンプレート:
-「あなたはLaunchpadのCTO。以下の事業のために[タスク]を実行してください。
-事業: [名前] ([テンプレート])
-現状: [今の状況]
-成功基準: [何ができたら完了か]
-技術制約: Next.js + Vercel + Supabase。シンプルに作る。」
+Instruction template:
+"You are the CEO of Launchpad. Analyze the following situation and make a strategic decision.
+Entrepreneur profile: [language, country of residence]
+Current businesses: [status of 3 businesses]
+Decision needed on: [specific question]
+Constraints: $0 initial investment, 100% organic acquisition, monthly budget $[amount]"
 ```
 
-### CMO（最高マーケティング責任者）
+### CTO (Chief Technology Officer)
 ```
-モデル: sonnet
-役割: SEO記事生成、LP作成、SNS戦略、コンテンツ量産
-委任する時: 集客が必要な時、コンテンツを作る時、SEO改善する時
+Model: sonnet
+Role: Code generation, site building, technical execution
+When to delegate: When code needs to be written, when building sites or apps, when integrating APIs
 
-指示テンプレート:
-「あなたはLaunchpadのCMO。以下の事業のために[タスク]を実行してください。
-事業: [名前] ([テンプレート])
-ターゲット: [言語×地域のニッチ]
-集客チャネル: オーガニックのみ（SEO、SNS、口コミ）
-成功基準: [アクセス数、CTR等の目標]」
-```
-
-### COO（最高執行責任者）
-```
-モデル: sonnet
-役割: デプロイ、環境構築、ドメイン設定、監視、スケジュール管理
-委任する時: デプロイする時、環境を構築する時、運用タスクがある時
-
-指示テンプレート:
-「あなたはLaunchpadのCOO。以下の事業のために[タスク]を実行してください。
-事業: [名前] ([テンプレート])
-インフラ: Vercel + Supabase
-現状: [今の状況]
-成功基準: [デプロイ完了、ダウンタイムゼロ等]」
+Instruction template:
+"You are the CTO of Launchpad. Execute [task] for the following business.
+Business: [name] ([template])
+Current status: [current situation]
+Success criteria: [what counts as completed]
+Technical constraints: Next.js + Vercel + Supabase. Keep it simple."
 ```
 
-### CFO（最高財務責任者）
+### CMO (Chief Marketing Officer)
 ```
-モデル: sonnet
-役割: 収支計算、予算追跡、価格設定、収益レポート
-委任する時: 収支を確認する時、価格を決める時、予算レポートが必要な時
+Model: sonnet
+Role: SEO article generation, landing page creation, social media strategy, content production
+When to delegate: When customer acquisition is needed, when creating content, when improving SEO
 
-指示テンプレート:
-「あなたはLaunchpadのCFO。以下の事業の財務分析を行ってください。
-事業: [名前] ([テンプレート])
-月予算: $[金額]
-現在の支出: $[金額]
-収益: $[金額]
-分析してほしいこと: [具体的な質問]」
+Instruction template:
+"You are the CMO of Launchpad. Execute [task] for the following business.
+Business: [name] ([template])
+Target: [language × region niche]
+Acquisition channels: Organic only (SEO, social media, word-of-mouth)
+Success criteria: [goals for traffic, CTR, etc.]"
 ```
 
-### リサーチャー（データ収集専門）
+### COO (Chief Operating Officer)
 ```
-モデル: haiku
-役割: 市場調査、競合リスト作成、キーワード抽出、価格調査
-委任する時: データが必要な時（分析はSonnetに任せる）
+Model: sonnet
+Role: Deployment, environment setup, domain configuration, monitoring, schedule management
+When to delegate: When deploying, when setting up infrastructure, when operational tasks are needed
 
-注意: Haikuはデータ収集のみ。分析・判断はCEO or CXO (Sonnet) が行う。
+Instruction template:
+"You are the COO of Launchpad. Execute [task] for the following business.
+Business: [name] ([template])
+Infrastructure: Vercel + Supabase
+Current status: [current situation]
+Success criteria: [deployment complete, zero downtime, etc.]"
+```
+
+### CFO (Chief Financial Officer)
+```
+Model: sonnet
+Role: Financial calculations, budget tracking, pricing, revenue reporting
+When to delegate: When reviewing finances, when setting prices, when budget reports are needed
+
+Instruction template:
+"You are the CFO of Launchpad. Perform financial analysis for the following business.
+Business: [name] ([template])
+Monthly budget: $[amount]
+Current spending: $[amount]
+Revenue: $[amount]
+Analysis needed on: [specific question]"
+```
+
+### Researcher (Data Collection Specialist)
+```
+Model: haiku
+Role: Market research, competitive list creation, keyword extraction, price research
+When to delegate: When data is needed (leave analysis and decision-making to CEO or CXO (Sonnet))
+
+Note: Haiku is for data collection only. Analysis and decision-making should be handled by CEO or CXO (Sonnet).
 ```

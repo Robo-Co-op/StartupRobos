@@ -12,14 +12,16 @@ vi.mock('@anthropic-ai/sdk', () => ({
 import { runCouncil } from './council'
 
 function makeSupabase(budgetRow: { spent_usd: number; total_usd: number } | null): SupabaseClient {
+  const remaining = budgetRow ? budgetRow.total_usd - budgetRow.spent_usd : 0
   return {
+    rpc: vi.fn().mockResolvedValue({
+      data: budgetRow ? [{ remaining }] : null,
+      error: budgetRow === null ? { message: 'not found' } : null,
+    }),
     from: vi.fn(() => ({
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
-          single: vi.fn().mockResolvedValue({
-            data: budgetRow,
-            error: budgetRow === null ? { message: 'not found' } : null,
-          }),
+          single: vi.fn().mockResolvedValue({ data: budgetRow, error: null }),
         })),
       })),
     })),
@@ -50,7 +52,7 @@ describe('runCouncil — pre-flight budget check', () => {
 
     await expect(
       runCouncil('user-abc', 'startup-xyz', 'context', 'agenda', supabase)
-    ).rejects.toThrow('予算情報が見つかりません')
+    ).rejects.toThrow('Budget information not found')
     await expect(
       runCouncil('user-abc', 'startup-xyz', 'context', 'agenda', supabase)
     ).rejects.not.toThrow(BudgetExhaustedError)

@@ -43,6 +43,10 @@ env.staff
 # vercel
 .vercel
 
+# memory runtime logs
+memory/*.log
+memory/archive/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

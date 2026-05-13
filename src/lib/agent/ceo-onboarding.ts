@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { calcCost } from '@/lib/agent/costs'
+import { extractText } from '@/lib/agent/responseSchemas'
 
 export interface OnboardingInput {
   languages: string[]
@@ -114,7 +115,7 @@ export async function runCEOOnboarding(
     messages: [{ role: 'user', content: userMessage }],
   })
 
-  const content = response.content[0].type === 'text' ? response.content[0].text : ''
+  const content = extractText(response)
   const costUsd = calcCost('claude-opus-4-6', response.usage.input_tokens, response.usage.output_tokens)
 
   // 実行ログ保存

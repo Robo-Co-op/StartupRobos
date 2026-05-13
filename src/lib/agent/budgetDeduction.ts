@@ -14,6 +14,30 @@ export class BudgetExhaustedError extends Error {
   }
 }
 
+/**
+ * Pre-flight budget check via Postgres RPC.
+ * Throws BudgetExhaustedError if remaining < minUsd (default 0).
+ * Throws generic Error if the budget row is not found.
+ */
+export async function checkBudgetPreFlight(
+  supabase: SupabaseClient,
+  userId: string,
+  minUsd = 0,
+): Promise<void> {
+  const { data, error } = await supabase.rpc('check_budget', { p_user_id: userId })
+
+  if (error || !data?.length) throw new Error('Budget information not found')
+
+  const remaining = Number(data[0].remaining)
+  if (remaining <= minUsd) {
+    throw new BudgetExhaustedError(
+      `Your token budget for this cycle has been used up` +
+      (remaining > 0 ? ` (remaining: $${remaining.toFixed(2)})` : '') +
+      '. Please wait for the next billing cycle or contact the operator to increase your budget.'
+    )
+  }
+}
+
 export async function deductBudget(
   supabase: SupabaseClient,
   userId: string,

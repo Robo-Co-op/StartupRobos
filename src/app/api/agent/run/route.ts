@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { runAgent, AgentConfig } from '@/lib/agent/harness'
 import { createServiceClient } from '@/lib/supabase/client'
 import { maskPII } from '@/lib/security/piiMasker'
+import { requireApiAuth } from '@/lib/auth'
 import { makeRateLimiter } from '@/lib/rateLimit'
 import { BudgetExhaustedError } from '@/lib/agent/budgetDeduction'
 import { z } from 'zod'
+
+// Vercel serverless function timeout (seconds)
+export const maxDuration = 300
 
 // Upstash Redis スライディングウィンドウ: 10リクエスト / 60秒 / ユーザー
 const checkRateLimit = makeRateLimiter(10, 60)
@@ -16,6 +20,10 @@ const requestSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
+  // API key authentication
+  const authError = requireApiAuth(req)
+  if (authError) return authError
+
   // middleware で検証済みのユーザーID（x-user-id ヘッダー）
   const userId = req.headers.get('x-user-id')
   if (!userId) {

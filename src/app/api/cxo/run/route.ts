@@ -4,8 +4,12 @@ import { createServiceClient } from '@/lib/supabase/client'
 import { maskPII } from '@/lib/security/piiMasker'
 import { MAX_PIVOTS } from '@/lib/startup/config'
 import { runCouncil } from '@/lib/agent/council'
+import { requireApiAuth } from '@/lib/auth'
 import { makeRateLimiter } from '@/lib/rateLimit'
 import { BudgetExhaustedError } from '@/lib/agent/budgetDeduction'
+
+// CXO council runs 5 sequential AI calls — needs generous timeout
+export const maxDuration = 300
 
 // Upstash Redis スライディングウィンドウ: CXO会議はリソース消費が大きいため3リクエスト / 60秒 / ユーザー
 const checkRateLimit = makeRateLimiter(3, 60)
@@ -16,6 +20,10 @@ const requestSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
+  // API key authentication
+  const authError = requireApiAuth(req)
+  if (authError) return authError
+
   const userId = req.headers.get('x-user-id')
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
