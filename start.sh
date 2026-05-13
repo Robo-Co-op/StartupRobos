@@ -97,11 +97,11 @@ done
 # ---------------------------------------------------------------------------
 if ! command -v claude &>/dev/null; then
   echo "  Claude Code CLI is required."
-  echo "  Install: npm install -g @anthropic-ai/claude-code"
+  echo "  Install: npm install -g @anthropic-ai/claude-code@1"
   echo ""
   read -r -p "  Install now? (y/n): " install_cc
   if [[ "$install_cc" == "y" || "$install_cc" == "Y" ]]; then
-    npm install -g @anthropic-ai/claude-code
+    npm install -g @anthropic-ai/claude-code@1
   else
     echo "  Please install Claude Code and try again."
     exit 1
