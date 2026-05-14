@@ -47,24 +47,16 @@ export const RESPONSE_SCHEMAS: Record<TaskType, z.ZodTypeAny> = {
   pivot_decision: PivotDecisionSchema,
 }
 
-// --- Extract plain text from Anthropic message response ---
-export function extractText(response: Anthropic.Message): string {
-  return response.content
-    .filter((block): block is Anthropic.TextBlock => block.type === 'text')
-    .map((block) => block.text)
-    .join('')
-}
-
 // --- Parse agent response text against a Zod schema ---
 export function parseAgentResponse<T extends z.ZodTypeAny>(
   raw: string,
   schema: T
 ): { parsed: z.infer<T> | null; error?: string; raw: string } {
   // For MarketResearchSchema, wrap free text directly
-  if (schema === MarketResearchSchema) {
-    const result = schema.safeParse({ content: raw })
+  if ((schema as z.ZodTypeAny) === MarketResearchSchema) {
+    const result = MarketResearchSchema.safeParse({ content: raw })
     if (result.success) {
-      return { parsed: result.data, raw }
+      return { parsed: result.data as z.infer<T>, raw }
     }
     return { parsed: null, error: result.error.message, raw }
   }
