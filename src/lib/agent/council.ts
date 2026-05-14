@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { CXO_SYSTEM_PROMPTS, CXO_MODELS, type CXORole } from './cxo'
-import { extractText } from './responseSchemas'
+import { extractText } from '@/lib/agent/responseSchemas'
 import { checkBudgetPreFlight, deductBudget, BudgetExhaustedError } from '@/lib/agent/budgetDeduction'
 import { calcCost } from '@/lib/agent/costs'
 import { anthropic } from './anthropicClient'
