@@ -49,7 +49,7 @@ async function getArtifacts() {
       supabase.from('startups').select('id, name'),
     ])
     const startupMap = Object.fromEntries(
-      (startupsRes.data ?? []).map((s: any) => [s.id, s])
+      (startupsRes.data ?? []).map((s: { id: string; name: string }) => [s.id, s])
     )
     return { runs: runsRes.data ?? [], startupMap }
   } catch {
@@ -138,7 +138,7 @@ export default async function ArtifactsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {runs.map((run: any, i: number) => {
+              {runs.map((run: { id: string; task_type?: string | null; startup_id?: string | null; cost_usd?: number | null; created_at: string; result?: string | null }, i: number) => {
                 const agent = run.task_type ? TASK_AGENT[run.task_type] : null
                 const taskLabel = agent?.taskLabel ?? run.task_type ?? 'Task'
                 const startup = run.startup_id ? startupMap[run.startup_id] : null

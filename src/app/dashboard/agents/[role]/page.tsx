@@ -98,9 +98,9 @@ async function getAgentData(role: string) {
 
     const runs = runsRes.data ?? []
     const startups = startupsRes.data ?? []
-    const startupMap = Object.fromEntries(startups.map((s: any) => [s.id, s]))
+    const startupMap = Object.fromEntries(startups.map((s: { id: string; name: string; business_type: string | null }) => [s.id, s]))
 
-    const totalCost = runs.reduce((sum: number, r: any) => sum + Number(r.cost_usd || 0), 0)
+    const totalCost = runs.reduce((sum: number, r: { cost_usd?: number | null }) => sum + Number(r.cost_usd || 0), 0)
     const avgCost = runs.length > 0 ? totalCost / runs.length : 0
 
     // 直近7日間のデータでグラフ描画
@@ -111,7 +111,7 @@ async function getAgentData(role: string) {
       const key = d.toISOString().slice(0, 10)
       dayBuckets[key] = 0
     }
-    runs.forEach((r: any) => {
+    runs.forEach((r: { created_at: string; cost_usd?: number | null }) => {
       const day = r.created_at.slice(0, 10)
       if (day in dayBuckets) {
         dayBuckets[day] += Number(r.cost_usd || 0)
@@ -233,7 +233,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ ro
             <p className="text-[12px] text-zinc-600">No runs yet.</p>
           ) : (
             <div className="space-y-2">
-              {runs.map((run: any, i: number) => {
+              {runs.map((run: { id: string; startup_id?: string | null; cost_usd?: number | null; created_at: string; result?: string | null }, i: number) => {
                 const startup = run.startup_id ? startupMap[run.startup_id] : null
                 const resultPreview = typeof run.result === 'string'
                   ? run.result.slice(0, 200).replace(/\n/g, ' ')

@@ -4,6 +4,10 @@ import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/client'
 import { TYPE_CONFIG, SITE_URLS } from '@/lib/startup/config'
 
+interface StartupRow { id: string; name: string; status: string; business_type: string | null; description?: string | null }
+interface ExperimentRow { id: string; startup_id: string | null; status: string }
+interface RunRow { id: string; startup_id: string | null; cost_usd: number | null }
+
 async function getStartupsWithMetrics() {
   try {
     const supabase = createServiceClient()
@@ -13,20 +17,20 @@ async function getStartupsWithMetrics() {
       supabase.from('agent_runs').select('id, startup_id, cost_usd'),
     ])
 
-    const startups = startupsRes.data ?? []
-    const experiments = experimentsRes.data ?? []
-    const runs = runsRes.data ?? []
+    const startups = (startupsRes.data ?? []) as StartupRow[]
+    const experiments = (experimentsRes.data ?? []) as ExperimentRow[]
+    const runs = (runsRes.data ?? []) as RunRow[]
 
     // スタートアップごとのメトリクス集計
-    return startups.map((s: any) => {
-      const sExperiments = experiments.filter((e: any) => e.startup_id === s.id)
-      const sRuns = runs.filter((r: any) => r.startup_id === s.id)
-      const cost = sRuns.reduce((sum: number, r: any) => sum + Number(r.cost_usd || 0), 0)
+    return startups.map((s) => {
+      const sExperiments = experiments.filter((e) => e.startup_id === s.id)
+      const sRuns = runs.filter((r) => r.startup_id === s.id)
+      const cost = sRuns.reduce((sum: number, r) => sum + Number(r.cost_usd || 0), 0)
       return {
         ...s,
         experimentCount: sExperiments.length,
-        runningExperiments: sExperiments.filter((e: any) => e.status === 'running').length,
-        successExperiments: sExperiments.filter((e: any) => e.status === 'success').length,
+        runningExperiments: sExperiments.filter((e) => e.status === 'running').length,
+        successExperiments: sExperiments.filter((e) => e.status === 'success').length,
         runCount: sRuns.length,
         cost,
       }
@@ -39,9 +43,9 @@ async function getStartupsWithMetrics() {
 export default async function StartupsIndexPage() {
   const startups = await getStartupsWithMetrics()
 
-  const totalCost = startups.reduce((sum: number, s: any) => sum + s.cost, 0)
-  const totalRuns = startups.reduce((sum: number, s: any) => sum + s.runCount, 0)
-  const totalExperiments = startups.reduce((sum: number, s: any) => sum + s.experimentCount, 0)
+  const totalCost = startups.reduce((sum, s) => sum + s.cost, 0)
+  const totalRuns = startups.reduce((sum, s) => sum + s.runCount, 0)
+  const totalExperiments = startups.reduce((sum, s) => sum + s.experimentCount, 0)
 
   return (
     <div className="flex flex-col min-h-0 overflow-auto">
@@ -72,7 +76,7 @@ export default async function StartupsIndexPage() {
           <SummaryCard
             label="Experiments"
             value={totalExperiments.toString()}
-            sub={`${startups.filter((s: any) => s.runningExperiments > 0).length} with running`}
+            sub={`${startups.filter((s) => s.runningExperiments > 0).length} with running`}
             color="blue"
           />
           <SummaryCard
@@ -96,9 +100,9 @@ export default async function StartupsIndexPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {startups.map((s: any, i: number) => {
-              const typeConfig = TYPE_CONFIG[s.business_type] || {
-                label: s.business_type,
+            {startups.map((s, i) => {
+              const typeConfig = (s.business_type && TYPE_CONFIG[s.business_type]) || {
+                label: s.business_type ?? 'unknown',
                 color: '#6b7280',
                 bg: 'rgba(107, 114, 128, 0.1)',
               }
