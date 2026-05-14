@@ -26,7 +26,6 @@ describe('requireApiAuth', () => {
     vi.stubEnv('API_SECRET', '')
     const result = requireApiAuth(makeReq({ 'x-api-secret': 'anything' }))
     expect(result).not.toBeNull()
-    const body = (result as any).body
     expect(result!.status).toBe(500)
   })
 

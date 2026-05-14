@@ -73,6 +73,7 @@ describe('GET /api/heartbeat/ceo', () => {
           eq: vi.fn().mockResolvedValue({ data: [], error: null }),
         })),
       })),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any)
 
     const res = await GET(makeRequest())
