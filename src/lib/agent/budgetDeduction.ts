@@ -31,9 +31,7 @@ export async function checkBudgetPreFlight(
   const remaining = Number(data[0].remaining)
   if (remaining <= minUsd) {
     throw new BudgetExhaustedError(
-      `Your token budget for this cycle has been used up` +
-      (remaining > 0 ? ` (remaining: $${remaining.toFixed(2)})` : '') +
-      '. Please wait for the next billing cycle or contact the operator to increase your budget.'
+      'Your token budget for this cycle has been used up. Please wait for the next billing cycle or contact the operator to increase your budget.'
     )
   }
 }
