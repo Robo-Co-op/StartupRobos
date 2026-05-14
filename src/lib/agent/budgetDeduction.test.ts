@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { deductBudget, BudgetExhaustedError } from './budgetDeduction'
+import { deductBudget, checkBudgetPreFlight, BudgetExhaustedError } from './budgetDeduction'
 
 // Supabase クライアントのモックファクトリー
 function makeSupabase(rpcResult: { data: unknown; error: unknown }): SupabaseClient {
@@ -34,6 +34,39 @@ describe('deductBudget', () => {
     const supabase = makeSupabase({ data: null, error: { message: 'DB connection failed' } })
 
     await expect(deductBudget(supabase, 'user-789', 5)).rejects.toThrow('DB connection failed')
+  })
+})
+
+describe('checkBudgetPreFlight', () => {
+  it('resolves when budget is sufficient (remaining > minUsd)', async () => {
+    const supabase = makeSupabase({ data: [{ remaining: 5.00 }], error: null })
+    await expect(checkBudgetPreFlight(supabase, 'user-1')).resolves.toBeUndefined()
+  })
+
+  it('throws BudgetExhaustedError when remaining is 0 (default minUsd=0)', async () => {
+    const supabase = makeSupabase({ data: [{ remaining: 0 }], error: null })
+    await expect(checkBudgetPreFlight(supabase, 'user-1')).rejects.toThrow(BudgetExhaustedError)
+  })
+
+  it('throws BudgetExhaustedError when remaining is below minUsd threshold', async () => {
+    const supabase = makeSupabase({ data: [{ remaining: 0.05 }], error: null })
+    await expect(checkBudgetPreFlight(supabase, 'user-1', 0.10)).rejects.toThrow(BudgetExhaustedError)
+  })
+
+  it('throws BudgetExhaustedError at exact boundary (remaining === minUsd)', async () => {
+    const supabase = makeSupabase({ data: [{ remaining: 0.10 }], error: null })
+    await expect(checkBudgetPreFlight(supabase, 'user-1', 0.10)).rejects.toThrow(BudgetExhaustedError)
+  })
+
+  it('throws generic Error when RPC returns error', async () => {
+    const supabase = makeSupabase({ data: null, error: { message: 'connection failed' } })
+    await expect(checkBudgetPreFlight(supabase, 'user-1')).rejects.toThrow('Budget information not found')
+    await expect(checkBudgetPreFlight(supabase, 'user-1')).rejects.not.toThrow(BudgetExhaustedError)
+  })
+
+  it('throws generic Error when RPC returns empty data', async () => {
+    const supabase = makeSupabase({ data: [], error: null })
+    await expect(checkBudgetPreFlight(supabase, 'user-1')).rejects.toThrow('Budget information not found')
   })
 })
 
