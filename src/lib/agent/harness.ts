@@ -40,6 +40,8 @@ export async function runAgent(
   const maxTokens = config.maxTokens ?? 1000
 
   // Atomic budget check via RPC (avoids read-modify-write race)
+  // minUsd=0 (default): allow execution until budget is fully exhausted.
+  // council.ts uses MIN_BUDGET_USD=0.10 to reserve a buffer for the full CXO round.
   await checkBudgetPreFlight(supabaseServiceClient, config.userId)
 
   // Execute agent
