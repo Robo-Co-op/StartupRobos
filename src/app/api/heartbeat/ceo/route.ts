@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/client'
 import { sendReport } from '@/lib/notify'
 import { requireCronAuth } from '@/lib/auth'
-import { calcCost } from '@/lib/agent/costs'
-import { extractText } from '@/lib/agent/responseSchemas'
-import { anthropic } from '@/lib/agent/anthropicClient'
+import { runHeartbeatTask } from '@/lib/agent/heartbeatRunner'
 
 // CEO heartbeat calls Opus which can be slow
 export const maxDuration = 300
@@ -48,25 +46,13 @@ For each business:
 3. Priority (High/Medium/Low)`
 
   const start = Date.now()
-  const response = await anthropic.messages.create({
+  const { content, costUsd } = await runHeartbeatTask(supabase, {
     model: 'claude-opus-4-6',
-    max_tokens: 1500,
-    messages: [{ role: 'user', content: prompt }],
-    system: 'You are an experienced startup CEO. Make concise and specific decisions based on data.',
-  })
-
-  const content = extractText(response)
-  const costUsd = calcCost('claude-opus-4-6', response.usage.input_tokens, response.usage.output_tokens)
-
-  // Save execution log to Supabase
-  await supabase.from('agent_runs').insert({
-    startup_id: startups[0].id, // CEO handles overall, using representative entry
-    model: 'claude-opus-4-6',
-    tokens_input: response.usage.input_tokens,
-    tokens_output: response.usage.output_tokens,
-    cost_usd: costUsd,
-    task_type: 'pivot_analysis',
-    result: content,
+    maxTokens: 1500,
+    prompt,
+    systemPrompt: 'You are an experienced startup CEO. Make concise and specific decisions based on data.',
+    startupId: startups[0].id,
+    taskType: 'pivot_analysis',
   })
 
   // Send email notification

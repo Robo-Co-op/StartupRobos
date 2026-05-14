@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/client'
 import { requireCronAuth } from '@/lib/auth'
-import { calcCost } from '@/lib/agent/costs'
-import { extractText } from '@/lib/agent/responseSchemas'
-import { anthropic } from '@/lib/agent/anthropicClient'
+import { runHeartbeatTask } from '@/lib/agent/heartbeatRunner'
 
 // CXO heartbeat runs 5 sequential AI calls
 export const maxDuration = 300
@@ -83,54 +81,29 @@ export async function GET(req: NextRequest) {
     const task = BUSINESS_TASKS[startup.business_type]
     if (!task) continue
 
-    const response = await anthropic.messages.create({
+    const { content, costUsd } = await runHeartbeatTask(supabase, {
       model: 'claude-sonnet-4-6',
-      max_tokens: 800,
-      messages: [{ role: 'user', content: task.prompt }],
-      system: `You are the ${task.role} of Launchpad. Provide actionable and specific recommendations.`,
+      maxTokens: 800,
+      prompt: task.prompt,
+      systemPrompt: `You are the ${task.role} of Launchpad. Provide actionable and specific recommendations.`,
+      startupId: startup.id,
+      taskType: task.task_type,
     })
-
-    const content = extractText(response)
-    const costUsd = calcCost('claude-sonnet-4-6', response.usage.input_tokens, response.usage.output_tokens)
     totalCost += costUsd
-
-    await supabase.from('agent_runs').insert({
-      startup_id: startup.id,
-      model: 'claude-sonnet-4-6',
-      tokens_input: response.usage.input_tokens,
-      tokens_output: response.usage.output_tokens,
-      cost_usd: costUsd,
-      task_type: task.task_type,
-      result: content,
-    })
-
     results.push({ startup: startup.name, role: task.role, suggestions: content })
   }
 
   // Cross-functional tasks (COO / CFO)
   for (const task of CROSS_CXO_TASKS) {
-    const response = await anthropic.messages.create({
+    const { content, costUsd } = await runHeartbeatTask(supabase, {
       model: 'claude-sonnet-4-6',
-      max_tokens: 800,
-      messages: [{ role: 'user', content: task.prompt }],
-      system: `You are the ${task.role} of Launchpad. Provide actionable and specific recommendations.`,
+      maxTokens: 800,
+      prompt: task.prompt,
+      systemPrompt: `You are the ${task.role} of Launchpad. Provide actionable and specific recommendations.`,
+      startupId: startups[0].id,
+      taskType: task.task_type,
     })
-
-    const content = extractText(response)
-    const costUsd = calcCost('claude-sonnet-4-6', response.usage.input_tokens, response.usage.output_tokens)
     totalCost += costUsd
-
-    // COO/CFO handle overall responsibilities using representative startup_id
-    await supabase.from('agent_runs').insert({
-      startup_id: startups[0].id,
-      model: 'claude-sonnet-4-6',
-      tokens_input: response.usage.input_tokens,
-      tokens_output: response.usage.output_tokens,
-      cost_usd: costUsd,
-      task_type: task.task_type,
-      result: content,
-    })
-
     results.push({ role: task.role, report: content })
   }
 
