@@ -24,6 +24,7 @@ export function makeRateLimiter(
 
   if (!url || !token) {
     // Redis 未設定時は全リクエストを通す（開発環境向け）
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return async (_userId: string) => true
   }
 

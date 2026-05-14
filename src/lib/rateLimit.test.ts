@@ -11,21 +11,18 @@ const mockLimit = vi.fn()
 
 // @upstash/redis の Redis クラスをコンストラクタ互換でモック
 vi.mock('@upstash/redis', () => ({
-  Redis: class MockRedis {
-    constructor(_opts: { url: string; token: string }) {}
-  },
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Redis: class MockRedis { constructor(_opts: { url: string; token: string }) {} },
 }))
 
 // @upstash/ratelimit の Ratelimit をモック（slidingWindow も static として設定）
 vi.mock('@upstash/ratelimit', () => {
   class MockRatelimit {
     limit: ReturnType<typeof vi.fn>
-    constructor(_opts: unknown) {
-      this.limit = mockLimit
-    }
-    static slidingWindow(_limit: number, _window: string) {
-      return 'sliding-window-config'
-    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    constructor(_opts: unknown) { this.limit = mockLimit }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    static slidingWindow(_limit: number, _window: string) { return 'sliding-window-config' }
   }
   return { Ratelimit: MockRatelimit }
 })
