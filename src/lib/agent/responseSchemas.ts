@@ -1,6 +1,17 @@
 import { z } from 'zod'
 import type Anthropic from '@anthropic-ai/sdk'
 
+// --- Anthropic response helpers ---
+
+/**
+ * Extracts the text content from the first content block of an Anthropic message.
+ * Returns empty string if the first block is not a text block.
+ */
+export function extractText(response: Pick<Anthropic.Messages.Message, 'content'>): string {
+  const block = response.content[0]
+  return block?.type === 'text' ? (block.text ?? '') : ''
+}
+
 // --- Task types ---
 export type TaskType = 'pivot_analysis' | 'market_research' | 'mvp_spec' | 'pivot_decision'
 
