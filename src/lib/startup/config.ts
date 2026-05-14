@@ -25,14 +25,3 @@ export const SITE_URLS: Record<string, string> = {
   'Prompt Pack': 'https://robo-co-op.github.io/prompt-pack/',
   'Puzzle Games': 'https://robo-co-op.github.io/puzzle-games/',
 }
-
-/**
- * ビジネスタイプ → サイト URL マッピング
- * キー: business_type 値（DB カラム）
- * StartupCard など business_type ベースで URL を引く箇所に使用
- */
-export const SITE_URLS_BY_TYPE: Record<string, string> = {
-  affiliate_seo: 'https://robo-co-op.github.io/ai-tool-lab/',
-  digital_product: 'https://robo-co-op.github.io/prompt-pack/',
-  game_ads: 'https://robo-co-op.github.io/puzzle-games/',
-}

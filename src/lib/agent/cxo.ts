@@ -1,21 +1,5 @@
 export type CXORole = 'ceo' | 'cto' | 'cmo' | 'coo' | 'cfo'
 
-export const CXO_LABELS: Record<CXORole, string> = {
-  ceo: 'CEO',
-  cto: 'CTO',
-  cmo: 'CMO',
-  coo: 'COO',
-  cfo: 'CFO',
-}
-
-export const CXO_COLORS: Record<CXORole, string> = {
-  ceo: 'purple',
-  cto: 'blue',
-  cmo: 'pink',
-  coo: 'orange',
-  cfo: 'green',
-}
-
 export const CXO_MODELS = {
   ceo: 'claude-opus-4-6',
   cto: 'claude-sonnet-4-6',
