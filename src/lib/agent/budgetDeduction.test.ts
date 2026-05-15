@@ -35,6 +35,16 @@ describe('deductBudget', () => {
 
     await expect(deductBudget(supabase, 'user-789', 5)).rejects.toThrow('DB connection failed')
   })
+
+  it('負の cost を拒否する', async () => {
+    const supabase = makeSupabase({ data: [], error: null })
+    await expect(deductBudget(supabase, 'user-001', -10)).rejects.toThrow('cost must be a positive number')
+  })
+
+  it('ゼロの cost を拒否する', async () => {
+    const supabase = makeSupabase({ data: [], error: null })
+    await expect(deductBudget(supabase, 'user-001', 0)).rejects.toThrow('cost must be a positive number')
+  })
 })
 
 describe('checkBudgetPreFlight', () => {

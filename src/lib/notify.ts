@@ -5,11 +5,13 @@ export function escapeHtml(s: string): string {
 }
 
 export function markdownToHtml(body: string): string {
-  return body
-    .replace(/^## (.+)$/gm, (_, g) => `<h2>${escapeHtml(g)}</h2>`)
-    .replace(/^### (.+)$/gm, (_, g) => `<h3>${escapeHtml(g)}</h3>`)
-    .replace(/^- (.+)$/gm, (_, g) => `<li>${escapeHtml(g)}</li>`)
-    .replace(/\*\*(.+?)\*\*/g, (_, g) => `<strong>${escapeHtml(g)}</strong>`)
+  // Escape all HTML first to prevent injection, then apply markdown formatting.
+  // Markdown syntax chars (# * -) are not HTML special chars, so they survive escaping.
+  return escapeHtml(body)
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\n/g, '<br>')
 }
 

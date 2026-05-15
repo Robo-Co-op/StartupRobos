@@ -34,6 +34,10 @@ describe('maskPII', () => {
     expect(maskPII('card: 4111 1111 1111 1111')).toBe('card: [CARD_NUMBER]')
   })
 
+  it('ハイフンなしのクレジットカード番号をマスクする（ID_NUMBER に食われない）', () => {
+    expect(maskPII('card: 4111111111111111')).toBe('card: [CARD_NUMBER]')
+  })
+
   it('PII を含まないテキストは変換しない', () => {
     const clean = 'StartupRobos はエージェント型スタートアップ基盤です。'
     expect(maskPII(clean)).toBe(clean)

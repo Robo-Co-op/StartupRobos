@@ -41,6 +41,8 @@ export async function deductBudget(
   userId: string,
   cost: number
 ): Promise<{ ok: boolean; remaining: number | null }> {
+  if (cost <= 0) throw new Error('cost must be a positive number')
+
   const { data, error } = await supabase.rpc('spend_budget', {
     p_user_id: userId,
     p_amount: cost,

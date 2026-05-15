@@ -1,4 +1,10 @@
 import { NextResponse } from 'next/server'
+import { timingSafeEqual } from 'node:crypto'
+
+function safeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false
+  return timingSafeEqual(Buffer.from(a), Buffer.from(b))
+}
 
 /**
  * Validate API_SECRET header authentication.
@@ -12,7 +18,7 @@ export function requireApiAuth(req: { headers: { get(name: string): string | nul
   }
 
   const provided = req.headers.get('x-api-secret')
-  if (!provided || provided !== secret) {
+  if (!provided || !safeEqual(provided, secret)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -32,7 +38,7 @@ export function requireCronAuth(req: { headers: { get(name: string): string | nu
 
   const authHeader = req.headers.get('authorization')
   const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
-  if (!token || token !== secret) {
+  if (!token || !safeEqual(token, secret)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
