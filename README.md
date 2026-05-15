@@ -2,57 +2,32 @@
 
 AI CXO team that runs digital businesses for you. Just talk.
 
-> **Formerly: Launchpad.** Same codebase, new name. The `/dashboard` UI still reads "Launchpad" — renaming is in progress.
+---
+
+## Quick Start (5 minutes)
+
+1. **Create your instance** — Click **"Use this template"** on [Robo-Co-op/StartupRobos](https://github.com/Robo-Co-op/StartupRobos) (NOT fork!)
+2. **Clone it**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/your-instance-name.git
+   cd your-instance-name
+   npm install
+   ```
+3. **Open in Claude Code Desktop** and say:
+   > **"I want to startup"**
+
+That's it. The AI walks you through everything — picks businesses, sets up infra, starts building.
+
+> ⚠️ **Do NOT clone or work inside the upstream `Robo-Co-op/StartupRobos` repo directly.**
+> That's the framework. Your businesses live in *your* template instance. See [Why?](#why-use-this-template-not-fork-or-clone) below.
 
 ---
 
-## 🚨 Read this first — architectural model
+## What happens next
 
-**StartupRobos is a framework, not a template for a single business.**
+Claude Code opens and asks what languages you speak. The CEO (Opus) picks 3 starter businesses. CxO agents (Sonnet) build and run them. You check in when you want.
 
-- If you want to **run businesses for yourself**: click **"Use this template"** on GitHub (NOT fork). Your businesses live inside *your* instance.
-- If you want to **build a new business** (e.g. Robo Match, OpenCareers) that leverages the CxO multi-agent pattern: create your StartupRobos instance first, then add the business under `businesses/<slug>/` inside that instance. **Do NOT copy `.claude/agents/`, `AGENTS.md`, or `src/lib/agent/` into a standalone repo.** You will waste weeks and lose future upstream improvements.
-
-**Rule of thumb:** one StartupRobos instance = one operator = N businesses run by the shared CxO team.
-
-```
-❌ Wrong:   robo-match-standalone-repo (re-implements CxO prompts)
-✅ Right:   my-startuprobos/businesses/robo-match/  (uses shared CxOs)
-```
-
-### Why "Use this template" instead of fork?
-
-| | Template clone | Fork |
-|--|---------------|------|
-| Setup scripts run cleanly | ✅ | ⚠️ references remain |
-| History is yours | ✅ | ❌ (carries upstream history) |
-| Can pull upstream fixes later | ✅ `git remote add upstream …` | ✅ |
-| GitHub default branch flexible | ✅ | ⚠️ |
-
-The OpenFisca project (our design inspiration) learned this the hard way and [explicitly warns against forking](https://github.com/openfisca/country-template).
-
----
-
-## Start (for operators)
-
-```bash
-# 1. On GitHub: click "Use this template" on Robo-Co-op/StartupRobos
-#    → creates YOUR_USERNAME/<your-instance-name>
-# 2. Clone your new instance:
-git clone https://github.com/YOUR_USERNAME/<your-instance-name>.git
-cd <your-instance-name>
-npm install
-
-# 3. Run the init script — sets up .env, picks businesses, writes README:
-bash scripts/init-operator.sh
-
-# 4. Launch Claude Code:
-claude
-```
-
-Claude Code opens and asks what languages you speak. The CEO (Opus) picks 3 businesses. CxO agents (Sonnet) build and run them. You check in when you want.
-
-## Default businesses (all $0 to start)
+### Default businesses (all $0 to start)
 
 | Type | What | Revenue |
 |------|------|---------|
@@ -60,7 +35,9 @@ Claude Code opens and asks what languages you speak. The CEO (Opus) picks 3 busi
 | Digital Products | Templates, ebooks on Gumroad | Direct sales |
 | Games + Ads | HTML5 games with AdSense | Ad revenue |
 
-New business types can be added by the CEO agent or proposed by the operator. They live under `businesses/` in your instance. See `businesses/_template/README.md` for the convention.
+New business types can be added by the CEO agent or proposed by you. They live under `businesses/` in your instance.
+
+---
 
 ## Requirements
 
@@ -69,21 +46,38 @@ New business types can be added by the CEO agent or proposed by the operator. Th
 - GitHub account
 - Free tier works for: Supabase, Vercel, Gumroad
 
-## How it works
+---
 
-StartupRobos is a Claude Code configuration + Next.js Mission Control dashboard. Open Claude Code in your instance → it becomes your coordinator → delegates to CEO (Opus) for strategy → CEO delegates to CTO/CMO/COO/CFO (Sonnet) for execution.
+## Setup: Supabase & Vercel (guided-manual)
 
+The init script (`bash scripts/init-operator.sh`) walks you through these, or do them by hand:
+
+### Supabase
+
+1. Create a free project at [supabase.com](https://supabase.com)
+2. **SQL Editor** → paste `supabase/schema.sql` → **Run**
+3. **SQL Editor** → paste `supabase/migrations/001_spend_budget_rpc.sql` → **Run**
+4. **Settings > API** → copy Project URL, anon key, service role key
+
+### Environment
+
+```bash
+cp .env.example .env.local
+# Fill in Supabase keys + Anthropic API key
+# Generate secrets: openssl rand -hex 32
 ```
-AI: "How should I call you?"
-You: "Ahmed"
-AI: "Hi Ahmed! Which languages do you speak?" → pick from list
-AI: "Where do you live?" → pick from list
-AI: "Here are 3 businesses I recommend..."
-You: "Let's go"
-AI: → delegates to CTO, CMO, COO, CFO → they start building
+
+### Vercel
+
+```bash
+npx vercel          # Link to your Vercel project
+npx vercel env add  # Add each key from .env.local
+npx vercel --prod   # Deploy
 ```
 
-Daily heartbeats (Vercel Cron) keep agents running even when you're not at the keyboard. Reports go to the operator by email. Mission Control dashboard at `/dashboard` shows everything live.
+Daily heartbeats (Vercel Cron) keep agents running even when you're offline. Reports go to the operator by email. Mission Control dashboard at `/dashboard` shows everything live.
+
+---
 
 ## Budget
 
@@ -100,53 +94,40 @@ With prompt caching enabled (configured in `.claude/` + `src/lib/agent/`), expec
 
 ---
 
-## Full Setup (manual — if you skipped `init-operator.sh`)
+## Architecture & Design Decisions
 
-### 1. Create your instance
+### Why "Use this template" (not fork or clone)?
 
-```bash
-# Click "Use this template" on Robo-Co-op/StartupRobos, then:
-git clone https://github.com/YOUR_USERNAME/<your-instance-name>.git
-cd <your-instance-name>
-npm install
+**StartupRobos is a framework, not a single-business template.**
+
+- One StartupRobos instance = one operator = N businesses run by the shared CxO team.
+- Your businesses live under `businesses/<slug>/` inside *your* instance.
+- **Do NOT copy `.claude/agents/`, `AGENTS.md`, or `src/lib/agent/` into a standalone repo.** You'll waste weeks and lose upstream improvements.
+
+```
+❌ Wrong:   robo-match-standalone-repo (re-implements CxO prompts)
+✅ Right:   my-startuprobos/businesses/robo-match/  (uses shared CxOs)
 ```
 
-### 2. Supabase
+| | Template clone | Fork |
+|--|---------------|------|
+| Setup scripts run cleanly | ✅ | ⚠️ references remain |
+| History is yours | ✅ | ❌ (carries upstream history) |
+| Can pull upstream fixes later | ✅ `git remote add upstream …` | ✅ |
 
-1. Create a free project at [supabase.com](https://supabase.com)
-2. **SQL Editor** → paste contents of `supabase/schema.sql` → **Run**
-3. **SQL Editor** → paste contents of `supabase/migrations/001_spend_budget_rpc.sql` → **Run**
-4. **Settings > API** → copy Project URL, anon key, service role key
+The OpenFisca project (our design inspiration) learned this the hard way and [explicitly warns against forking](https://github.com/openfisca/country-template).
 
-### 3. Environment
-
-```bash
-cp .env.example .env.local
-# Edit .env.local with your Supabase keys + Anthropic API key + secrets
-# Generate API_SECRET: openssl rand -hex 32
-# Generate CRON_SECRET: openssl rand -hex 32
-```
-
-### 4. Deploy to Vercel
+### Staying up to date with upstream
 
 ```bash
-npx vercel          # Link to your Vercel project
-npx vercel env add  # Add each key from .env.local (for production)
-npx vercel --prod   # Deploy
-```
-
-### 5. Start operating
-
-```bash
-claude   # in the project directory
-# AI will guide you through onboarding
+git remote add upstream https://github.com/Robo-Co-op/StartupRobos.git
+git fetch upstream
+git merge upstream/main
 ```
 
 ---
 
 ## Adding a new business (for contributors)
-
-**If you are a CXO agent building a new business inside a StartupRobos instance:**
 
 1. Copy `businesses/_template/` to `businesses/<your-business-slug>/`
 2. Fill in `businesses/<your-business-slug>/README.md` following the template
@@ -155,14 +136,6 @@ claude   # in the project directory
 5. Update `memory/MEMORY.md` with the business context
 
 **Do not create a standalone repo for a single business.** A business is not a framework.
-
-## Staying up to date with upstream
-
-```bash
-git remote add upstream https://github.com/Robo-Co-op/StartupRobos.git
-git fetch upstream
-git merge upstream/main          # pull framework improvements
-```
 
 ## License
 
