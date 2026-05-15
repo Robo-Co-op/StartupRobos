@@ -96,7 +96,7 @@ export default async function StartupsIndexPage() {
         {/* プロジェクトカードグリッド */}
         {startups.length === 0 ? (
           <div className="card p-8 text-center">
-            <p className="text-[12px] text-zinc-600">まだプロジェクトなし</p>
+            <p className="text-[12px] text-zinc-600">No projects yet</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

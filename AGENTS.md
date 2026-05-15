@@ -46,7 +46,7 @@ Role: Strategic decisions, business selection, pivot decisions, experiment evalu
 When to call: Only when important decision-making is needed (do not call for daily conversations)
 
 Instruction template:
-"You are the CEO of Launchpad. Analyze the following situation and make a strategic decision.
+"You are the CEO of StartupRobos. Analyze the following situation and make a strategic decision.
 Entrepreneur profile: [language, country of residence]
 Current businesses: [status of 3 businesses]
 Decision needed on: [specific question]
@@ -60,7 +60,7 @@ Role: Code generation, site building, technical execution
 When to delegate: When code needs to be written, when building sites or apps, when integrating APIs
 
 Instruction template:
-"You are the CTO of Launchpad. Execute [task] for the following business.
+"You are the CTO of StartupRobos. Execute [task] for the following business.
 Business: [name] ([template])
 Current status: [current situation]
 Success criteria: [what counts as completed]
@@ -74,7 +74,7 @@ Role: SEO article generation, landing page creation, social media strategy, cont
 When to delegate: When customer acquisition is needed, when creating content, when improving SEO
 
 Instruction template:
-"You are the CMO of Launchpad. Execute [task] for the following business.
+"You are the CMO of StartupRobos. Execute [task] for the following business.
 Business: [name] ([template])
 Target: [language × region niche]
 Acquisition channels: Organic only (SEO, social media, word-of-mouth)
@@ -88,7 +88,7 @@ Role: Deployment, environment setup, domain configuration, monitoring, schedule 
 When to delegate: When deploying, when setting up infrastructure, when operational tasks are needed
 
 Instruction template:
-"You are the COO of Launchpad. Execute [task] for the following business.
+"You are the COO of StartupRobos. Execute [task] for the following business.
 Business: [name] ([template])
 Infrastructure: Vercel + Supabase
 Current status: [current situation]
@@ -102,7 +102,7 @@ Role: Financial calculations, budget tracking, pricing, revenue reporting
 When to delegate: When reviewing finances, when setting prices, when budget reports are needed
 
 Instruction template:
-"You are the CFO of Launchpad. Perform financial analysis for the following business.
+"You are the CFO of StartupRobos. Perform financial analysis for the following business.
 Business: [name] ([template])
 Monthly budget: $[amount]
 Current spending: $[amount]

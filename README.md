@@ -73,14 +73,14 @@ Daily heartbeats (Vercel Cron) keep agents running even when you're offline. Rep
 
 ## Budget
 
-$500/month runs 3 businesses in parallel.
+Costs depend on usage and model mix. A typical 3-business setup runs on a modest monthly API budget.
 
-| Role | Model | ~Cost |
+| Role | Model | Notes |
 |------|-------|-------|
-| Coordinator (main) | Sonnet | $150/mo |
-| CEO (strategy) | Opus | $30/mo |
-| CXOs (execution) | Sonnet | $200/mo |
-| Research | Haiku | $70/mo |
+| Coordinator (main) | Sonnet | Always-on, low cost |
+| CEO (strategy) | Opus | Called sparingly |
+| CXOs (execution) | Sonnet | Bulk of token usage |
+| Research | Haiku | Cheapest model |
 
 With prompt caching enabled (configured in `.claude/` + `src/lib/agent/`), expect ~40% lower effective cost.
 

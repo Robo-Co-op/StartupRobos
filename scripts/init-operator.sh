@@ -48,8 +48,11 @@ fi
 # -------- Prompt: operator identity --------
 read -r -p "Your name (how should the AI call you?): " OPERATOR_NAME
 read -r -p "Your email (for CEO daily reports) [NOTIFY_EMAIL]: " OPERATOR_EMAIL
-read -r -p "Monthly AI budget in USD [500]: " MONTHLY_BUDGET
-MONTHLY_BUDGET="${MONTHLY_BUDGET:-500}"
+read -r -p "Monthly AI budget in USD: " MONTHLY_BUDGET
+if [[ -z "$MONTHLY_BUDGET" ]]; then
+  red "Monthly budget is required."
+  exit 1
+fi
 
 # -------- Prompt: Supabase --------
 echo

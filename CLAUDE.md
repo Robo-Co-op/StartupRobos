@@ -39,7 +39,7 @@ When the user opens this project for the first time:
 Send the following message in your first response (copy as-is):
 
 ```
-🚀 Welcome to Launchpad!
+🚀 Welcome to StartupRobos!
 
 AI CXO team will build 3 businesses for you. Let's get started.
 
@@ -77,7 +77,7 @@ Where do you live? (Pick your country)
 ```
 
 ### Step 4: Budget Confirmation
-Ask for their monthly AI budget (recommended: $500).
+Ask for their monthly AI budget.
 
 ### Step 5: Business Proposal → Approval → Auto-Start
 The CEO Agent (Opus) selects the optimal 3 digital businesses based on language × country.
@@ -177,7 +177,7 @@ Based on Amazon's decision-making principles, determine CXO autonomy level.
 
 ### How to Call CEO Agent
 ```
-Agent(model: "opus", prompt: "You are the Launchpad CEO. Analyze the following situation and make a strategic decision...")
+Agent(model: "opus", prompt: "You are the StartupRobos CEO. Analyze the following situation and make a strategic decision...")
 ```
 
 ## CXO Team
@@ -225,7 +225,7 @@ Based on experiment results:
 1. Ask for their name with "How should I call you?"
 2. Ask them to pick languages (multiple choice from number list)
 3. Ask them to pick their country of residence (single choice from number list)
-4. Ask for monthly AI budget (recommended: $500)
+4. Ask for monthly AI budget
 5. Select optimal 3 templates based on language × country
 6. Propose each business's name, description, and first 5 experiments
 7. Get user approval
@@ -262,7 +262,7 @@ User instruction or experiment completion
 
 ### Report Format
 ```
-📊 Launchpad Daily Report
+📊 StartupRobos Daily Report
 
 Business 1: [Name] (affiliate_seo)
   Experiment #3: [Hypothesis] → [Result]
@@ -276,7 +276,7 @@ Business 3: [Name] (game_ads)
   Experiment #1: [Hypothesis] → [Result]
   Next Action: [Specific next step]
 
-💰 Budget: $XX / $500 spent
+💰 Budget: $XX / $YY spent
 ```
 
 ## Coding Standards
@@ -285,7 +285,6 @@ Business 3: [Name] (game_ads)
 - Commit messages: English, verb-first ("Add:", "Fix:", "Improve:")
 
 ## Budget Management
-- Default monthly: $500
 - Main session (you) = Sonnet = low cost, always running
 - CEO Agent (Opus) for strategic decisions only (max 2-3x per day)
 - CXO Agent (Sonnet) = execution tasks
