@@ -13,6 +13,8 @@ Done. The AI picks businesses, sets up infra, and starts building.
 > ⚠️ **Don't work directly in the upstream `Robo-Co-op/StartupRobos` repo.**
 > That's the framework. Your businesses live in *your* template instance. See [Why?](#why-use-this-template-not-fork-or-clone) below.
 
+📘 For the latest Small Digital Business Playbooks and operator guides, see [Co-op Lab on Notion](https://robocoop.notion.site/cooplab).
+
 ---
 
 ## What happens next
