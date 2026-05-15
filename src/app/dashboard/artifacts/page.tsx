@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
-import { createServiceClient } from '@/lib/supabase/client'
+import { createServiceClient } from '@/lib/supabase/server'
 import { timeAgo } from '@/lib/timeAgo'
 import { TASK_AGENT } from '@/lib/agent/roles'
 

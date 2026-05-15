@@ -1,3 +1,4 @@
+vi.mock('server-only', () => ({}))
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 import { BudgetExhaustedError } from '@/lib/agent/budgetDeduction'
@@ -5,7 +6,7 @@ import { BudgetExhaustedError } from '@/lib/agent/budgetDeduction'
 vi.mock('@/lib/agent/harness', () => ({
   runAgent: vi.fn(),
 }))
-vi.mock('@/lib/supabase/client', () => ({
+vi.mock('@/lib/supabase/server', () => ({
   createServiceClient: vi.fn(() => ({
     from: vi.fn(() => ({
       select: vi.fn(() => ({

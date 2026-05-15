@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createServiceClient } from '@/lib/supabase/client'
+import { createServiceClient } from '@/lib/supabase/server'
 import { maskPII } from '@/lib/security/piiMasker'
 import { MAX_PIVOTS } from '@/lib/startup/config'
 import { runCouncil } from '@/lib/agent/council'

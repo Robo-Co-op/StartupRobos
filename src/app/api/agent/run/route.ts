@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { runAgent, AgentConfig } from '@/lib/agent/harness'
-import { createServiceClient } from '@/lib/supabase/client'
+import { createServiceClient } from '@/lib/supabase/server'
 import { maskPII } from '@/lib/security/piiMasker'
 import { requireApiAuth } from '@/lib/auth'
 import { makeRateLimiter } from '@/lib/rateLimit'

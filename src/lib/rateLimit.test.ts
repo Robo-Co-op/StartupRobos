@@ -62,25 +62,33 @@ describe('makeRateLimiter', () => {
     expect(mockLimit).toHaveBeenCalledWith('user-002')
   })
 
-  it('UPSTASH 環境変数が未設定の場合はフォールバックして全リクエストを許可する', async () => {
-    // Arrange: 環境変数を削除してフォールバックを強制
-    const savedUrl = process.env.UPSTASH_REDIS_REST_URL
-    const savedToken = process.env.UPSTASH_REDIS_REST_TOKEN
-    delete process.env.UPSTASH_REDIS_REST_URL
-    delete process.env.UPSTASH_REDIS_REST_TOKEN
+  it('UPSTASH 環境変数が未設定の場合はフォールバックして全リクエストを許可する（開発環境）', async () => {
+    vi.stubEnv('UPSTASH_REDIS_REST_URL', '')
+    vi.stubEnv('UPSTASH_REDIS_REST_TOKEN', '')
 
-    // フォールバックパスはファクトリー呼び出し時点で分岐するため、
-    // 環境変数削除後にファクトリーを呼ぶ
     const check = makeRateLimiter(10, 60)
     const allowed = await check('user-003')
 
-    // フォールバック: Redisに接続せず true を返す
     expect(allowed).toBe(true)
-    // limit() は呼ばれない
     expect(mockLimit).not.toHaveBeenCalled()
 
-    // 環境変数を復元
-    process.env.UPSTASH_REDIS_REST_URL = savedUrl
-    process.env.UPSTASH_REDIS_REST_TOKEN = savedToken
+    vi.unstubAllEnvs()
+    process.env.UPSTASH_REDIS_REST_URL = 'https://test.upstash.io'
+    process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token'
+  })
+
+  it('本番環境（NODE_ENV=production）で Upstash 未設定の場合はリクエスト時に throw する', async () => {
+    vi.stubEnv('UPSTASH_REDIS_REST_URL', '')
+    vi.stubEnv('UPSTASH_REDIS_REST_TOKEN', '')
+    vi.stubEnv('NODE_ENV', 'production')
+
+    // ファクトリー呼び出しは成功する（ビルド時に throw しない）
+    const check = makeRateLimiter(10, 60)
+    // 実際のリクエスト時に throw
+    await expect(check('user-production')).rejects.toThrow('UPSTASH_REDIS_REST_URL')
+
+    vi.unstubAllEnvs()
+    process.env.UPSTASH_REDIS_REST_URL = 'https://test.upstash.io'
+    process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token'
   })
 })

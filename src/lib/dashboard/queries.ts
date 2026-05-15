@@ -1,4 +1,4 @@
-import { createServiceClient } from '@/lib/supabase/client'
+import { createServiceClient } from '@/lib/supabase/server'
 import { TASK_AGENT } from '@/lib/agent/roles'
 
 // --- Agent role definitions for dashboard display ---
@@ -93,7 +93,7 @@ export async function listAgents(): Promise<AgentListItem[]> {
   })
 }
 
-interface HeartbeatRun {
+export interface HeartbeatRun {
   id: string
   task_type: string | null
   startup_name: string | null
@@ -117,7 +117,10 @@ export async function listHeartbeats(limit = 100): Promise<HeartbeatRun[]> {
     (startupsRes.data ?? []).map((s: { id: string; name: string }) => [s.id, s.name]),
   )
 
-  return (runsRes.data ?? []).map((r: { id: string; task_type: string | null; startup_id: string | null; model: string | null; cost_usd: number; created_at: string }) => ({
+  type AgentRunRow = Pick<HeartbeatRun, 'id' | 'task_type' | 'model' | 'cost_usd' | 'created_at'> & {
+    startup_id: string | null
+  }
+  return (runsRes.data ?? []).map((r: AgentRunRow) => ({
     id: r.id,
     task_type: r.task_type,
     startup_name: r.startup_id ? startupMap[r.startup_id] ?? null : null,
@@ -127,9 +130,6 @@ export async function listHeartbeats(limit = 100): Promise<HeartbeatRun[]> {
   }))
 }
 
-export async function getActivityFeed(limit = 100): Promise<HeartbeatRun[]> {
-  return listHeartbeats(limit)
-}
 
 interface DashboardOverview {
   projects: Array<{ id: string; name: string; status: string; business_type: string | null }>

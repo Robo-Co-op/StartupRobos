@@ -62,6 +62,7 @@ describe('runHeartbeatTask', () => {
     expect(fromCall).toHaveBeenCalledWith('agent_runs')
     const insertCall = fromCall.mock.results[0].value.insert
     expect(insertCall).toHaveBeenCalledWith({
+      user_id: null,
       startup_id: 'startup-1',
       model: 'claude-sonnet-4-6',
       tokens_input: 200,

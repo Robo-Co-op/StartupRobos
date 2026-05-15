@@ -13,7 +13,15 @@ export function extractText(response: Pick<Anthropic.Messages.Message, 'content'
 }
 
 // --- Task types ---
-export type TaskType = 'pivot_analysis' | 'market_research' | 'mvp_spec' | 'pivot_decision'
+export type TaskType =
+  | 'pivot_analysis'
+  | 'market_research'
+  | 'mvp_spec'
+  | 'pivot_decision'
+  | 'ops_review'      // COO heartbeat タスク
+  | 'budget_review'   // CFO heartbeat タスク
+  | 'ceo_review'      // CEO heartbeat タスク（全スタートアップ俯瞰）
+  | 'cto_review'      // CTO heartbeat タスク（技術・エンゲージメント改善提案）
 
 // --- Zod schemas for each task type ---
 export const PivotAnalysisSchema = z.object({
@@ -24,6 +32,15 @@ export const PivotAnalysisSchema = z.object({
 
 export const MarketResearchSchema = z.object({
   content: z.string().min(20),
+})
+
+/**
+ * 自由テキスト形式のレスポンス用汎用スキーマ（min: 1）。
+ * JSON構造を期待しないタスク（ops_review / budget_review / ceo_review / cto_review）に使用。
+ * MarketResearchSchema（min: 20）より制約が緩く、短いシステムレポートにも対応する。
+ */
+export const FreeTextSchema = z.object({
+  content: z.string().min(1),
 })
 
 export const MvpSpecSchema = z.object({
@@ -42,19 +59,31 @@ export const PivotDecisionSchema = z.object({
 // --- Schema map used by harness ---
 export const RESPONSE_SCHEMAS: Record<TaskType, z.ZodTypeAny> = {
   pivot_analysis: PivotAnalysisSchema,
-  market_research: MarketResearchSchema,
+  market_research: FreeTextSchema,   // 自由テキスト（CMO マーケットリサーチ）
   mvp_spec: MvpSpecSchema,
   pivot_decision: PivotDecisionSchema,
+  ops_review: FreeTextSchema,        // 自由テキスト（COO レポート）
+  budget_review: FreeTextSchema,     // 自由テキスト（CFO レポート）
+  ceo_review: FreeTextSchema,        // 自由テキスト（CEO 俯瞰レポート）
+  cto_review: FreeTextSchema,        // 自由テキスト（CTO 改善提案レポート）
 }
+
+/**
+ * このスキーマセットに含まれるスキーマは JSON 解析が不要。
+ * AI の自由形式テキストをそのまま content フィールドにラップして返す。
+ * MarketResearchSchema を含めるのは、直接スキーマを渡すコード（テスト含む）との後方互換のため。
+ * RESPONSE_SCHEMAS では market_research → FreeTextSchema を使用。
+ */
+const RAW_TEXT_SCHEMAS = new Set<z.ZodTypeAny>([MarketResearchSchema, FreeTextSchema])
 
 // --- Parse agent response text against a Zod schema ---
 export function parseAgentResponse<T extends z.ZodTypeAny>(
   raw: string,
   schema: T
 ): { parsed: z.infer<T> | null; error?: string; raw: string } {
-  // For MarketResearchSchema, wrap free text directly
-  if ((schema as z.ZodTypeAny) === MarketResearchSchema) {
-    const result = MarketResearchSchema.safeParse({ content: raw })
+  // 自由テキストスキーマ: JSON不要でテキストをラップして返す
+  if (RAW_TEXT_SCHEMAS.has(schema)) {
+    const result = schema.safeParse({ content: raw })
     if (result.success) {
       return { parsed: result.data as z.infer<T>, raw }
     }

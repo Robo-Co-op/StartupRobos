@@ -19,4 +19,6 @@ export const TASK_AGENT: Record<string, TaskAgentDef> = {
   ops_review:     { label: 'COO', color: '#f97316', role: 'coo', taskLabel: 'Operations Review' },
   budget_review:  { label: 'CFO', color: '#22c55e', role: 'cfo', taskLabel: 'Budget Review' },
   pivot_decision: { label: 'CEO', color: '#f59e0b', role: 'ceo', taskLabel: 'Pivot Decision' },
+  ceo_review:     { label: 'CEO', color: '#f59e0b', role: 'ceo', taskLabel: 'CEO Review' },
+  cto_review:     { label: 'CTO', color: '#3b82f6', role: 'cto', taskLabel: 'CTO Review' },
 }

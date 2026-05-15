@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { createServiceClient } from '@/lib/supabase/client'
+import { createServiceClient } from '@/lib/supabase/server'
 import { timeAgo } from '@/lib/timeAgo'
 
 // エージェントロール定義（task_type → role のマッピング）

@@ -1,3 +1,4 @@
+vi.mock('server-only', () => ({}))
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -10,7 +11,7 @@ const mockInsert = vi.fn()
 const mockUpdateEq = vi.fn()
 const mockUpdate = vi.fn(() => ({ eq: mockUpdateEq }))
 
-vi.mock('@/lib/supabase/client', () => ({
+vi.mock('@/lib/supabase/server', () => ({
   createServiceClient: vi.fn(() => ({
     from: vi.fn((table: string) => {
       if (table === 'startups') return { select: mockSelect, update: mockUpdate }

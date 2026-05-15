@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
-import { createServiceClient } from '@/lib/supabase/client'
+import { createServiceClient } from '@/lib/supabase/server'
 import { TYPE_CONFIG, SITE_URLS } from '@/lib/startup/config'
 
 interface StartupRow { id: string; name: string; status: string; business_type: string | null; description?: string | null }

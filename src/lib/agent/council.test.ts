@@ -1,3 +1,4 @@
+vi.mock('server-only', () => ({}))
 import { describe, it, expect, vi } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { BudgetExhaustedError } from '@/lib/agent/budgetDeduction'

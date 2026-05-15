@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/client'
+import { createServiceClient } from '@/lib/supabase/server'
 import { requireApiAuth } from '@/lib/auth'
 import { maskPII } from '@/lib/security/piiMasker'
 import { MAX_PIVOTS } from '@/lib/startup/config'

@@ -1,18 +1,19 @@
 import { Box, Container, Flex, Badge, Text, Card } from '@radix-ui/themes'
 import Link from 'next/link'
 import {
-  getActivityFeed,
+  listHeartbeats,
   formatTaskType,
   formatModel,
   formatRelativeTime,
   agentForTaskType,
   AGENT_ROLES,
+  type HeartbeatRun,
 } from '@/lib/dashboard/queries'
 import PageHeader from '../_components/PageHeader'
 
 export const dynamic = 'force-dynamic'
 
-function groupByDay(runs: Awaited<ReturnType<typeof getActivityFeed>>) {
+function groupByDay(runs: HeartbeatRun[]) {
   const groups = new Map<string, typeof runs>()
   for (const r of runs) {
     const key = new Date(r.created_at).toISOString().slice(0, 10)
@@ -24,7 +25,7 @@ function groupByDay(runs: Awaited<ReturnType<typeof getActivityFeed>>) {
 }
 
 export default async function ActivityPage() {
-  const runs = await getActivityFeed(100)
+  const runs = await listHeartbeats(100)
   const grouped = groupByDay(runs)
 
   return (

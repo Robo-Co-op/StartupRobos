@@ -8,12 +8,14 @@ const EXPECTED_KEYS = [
   'ops_review',
   'budget_review',
   'pivot_decision',
+  'ceo_review',
+  'cto_review',
 ]
 
 describe('TASK_AGENT', () => {
-  it('contains all 6 task types', () => {
+  it('contains all 8 task types', () => {
     expect(Object.keys(TASK_AGENT)).toEqual(expect.arrayContaining(EXPECTED_KEYS))
-    expect(Object.keys(TASK_AGENT)).toHaveLength(6)
+    expect(Object.keys(TASK_AGENT)).toHaveLength(8)
   })
 
   it.each(EXPECTED_KEYS)('%s has label, color, role, and taskLabel', (key) => {

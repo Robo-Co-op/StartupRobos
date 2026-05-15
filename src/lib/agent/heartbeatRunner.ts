@@ -10,6 +10,8 @@ export interface HeartbeatTaskInput {
   systemPrompt: string
   startupId: string
   taskType: string
+  /** cron 実行時はユーザーが存在しないため省略可。省略時は null として記録される。 */
+  userId?: string
 }
 
 export interface HeartbeatTaskResult {
@@ -31,7 +33,8 @@ export async function runHeartbeatTask(
   const content = extractText(response)
   const costUsd = calcCost(input.model, response.usage.input_tokens, response.usage.output_tokens)
 
-  await supabase.from('agent_runs').insert({
+  const { error: insertError } = await supabase.from('agent_runs').insert({
+    user_id: input.userId ?? null,
     startup_id: input.startupId,
     model: input.model,
     tokens_input: response.usage.input_tokens,
@@ -40,6 +43,9 @@ export async function runHeartbeatTask(
     task_type: input.taskType,
     result: content,
   })
+  if (insertError) {
+    console.error('[heartbeatRunner] agent_runs insert 失敗（コスト記録漏れ）', insertError)
+  }
 
   return { content, costUsd }
 }

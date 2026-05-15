@@ -1,3 +1,4 @@
+vi.mock('server-only', () => ({}))
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
@@ -10,7 +11,7 @@ vi.mock('@/lib/notify', () => ({
 vi.mock('@/lib/agent/heartbeatRunner', () => ({
   runHeartbeatTask: vi.fn().mockResolvedValue({ content: 'CEO analysis', costUsd: 0.05 }),
 }))
-vi.mock('@/lib/supabase/client', () => ({
+vi.mock('@/lib/supabase/server', () => ({
   createServiceClient: vi.fn(() => ({
     from: vi.fn((table: string) => {
       if (table === 'startups') {
@@ -66,7 +67,7 @@ describe('GET /api/heartbeat/ceo', () => {
   })
 
   it('returns "No startups found" when no active startups', async () => {
-    const { createServiceClient } = await import('@/lib/supabase/client')
+    const { createServiceClient } = await import('@/lib/supabase/server')
     vi.mocked(createServiceClient).mockReturnValueOnce({
       from: vi.fn(() => ({
         select: vi.fn(() => ({

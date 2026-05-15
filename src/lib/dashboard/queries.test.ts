@@ -1,3 +1,4 @@
+vi.mock('server-only', () => ({}))
 import { describe, it, expect } from 'vitest'
 import { agentForTaskType, formatTaskType, formatModel, formatRelativeTime } from './queries'
 

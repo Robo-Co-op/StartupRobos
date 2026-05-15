@@ -13,7 +13,9 @@ export async function middleware(req: NextRequest) {
   }
 
   // 認証済みユーザーIDを route handler に転送（x-user-id ヘッダー経由）
+  // delete してから set することで外部から偽造された x-user-id ヘッダーを除去する
   const requestHeaders = new Headers(req.headers)
+  requestHeaders.delete('x-user-id')
   requestHeaders.set('x-user-id', user.id)
 
   return NextResponse.next({

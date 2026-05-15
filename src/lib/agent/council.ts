@@ -5,8 +5,16 @@ import { checkBudgetPreFlight, deductBudget, BudgetExhaustedError } from '@/lib/
 import { calcCost } from '@/lib/agent/costs'
 import { anthropic } from './anthropicClient'
 
-// Minimum budget: estimated upper bound for CXO 4 (sonnet) + CEO (opus)
-const MIN_BUDGET_USD = 0.10
+/**
+ * CXO 5役 + CEO の上限コスト見積もり:
+ *   Sonnet 4役 × (600 input + 600 output tokens) × $3/$15/M ≈ $0.01 × 4 = $0.04
+ *   Opus CEO: 2000 input × $15/M + 1000 output × $75/M ≈ $0.03 + $0.08 = $0.11
+ *   合計上限 ≈ $0.15
+ * バッファ込みで $0.20 を最低予算として設定。
+ * 注意: checkBudgetPreFlight 後に API 呼び出しが発生するため、concurrent リクエストでは
+ * 実際のコストが MIN_BUDGET_USD を超える可能性がある。deductBudget の RPC が TOCTOU を防ぐ。
+ */
+const MIN_BUDGET_USD = 0.20
 
 export interface CouncilResult {
   sessionId: string

@@ -96,6 +96,10 @@ function getSystemPrompt(taskType: TaskType): string {
     market_research: `You are a rapid market researcher. Given a startup idea, identify the target market, key competitors, and differentiation opportunity in under 500 words. Focus on actionable insights.`,
     mvp_spec: `You are a lean MVP architect. Define the smallest possible MVP that can validate the core hypothesis. Output valid JSON with fields: core_feature (string), validation_metric (string), build_time_estimate (string), tech_stack_suggestion (string).`,
     pivot_decision: `You are a decisive pivot evaluator. Given metrics and context, make a binary go/pivot decision. Output valid JSON with fields: decision ("go"|"pivot"), confidence (number 0-100), rationale (string).`,
+    ops_review: `You are a COO (Chief Operating Officer). Review operations and provide actionable recommendations.`,
+    budget_review: `You are a CFO (Chief Financial Officer). Review financials and provide actionable recommendations.`,
+    ceo_review: `You are the CEO. Review all active startups, assess overall health, and identify the highest-priority next action.`,
+    cto_review: `You are the CTO. Propose technical and UX improvements to improve product engagement and retention.`,
   }
   return prompts[taskType]
 }

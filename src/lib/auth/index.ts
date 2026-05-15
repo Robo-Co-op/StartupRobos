@@ -19,6 +19,10 @@ export function requireApiAuth(req: { headers: { get(name: string): string | nul
 
   const provided = req.headers.get('x-api-secret')
   if (!provided || !safeEqual(provided, secret)) {
+    console.warn('[auth] API 認証失敗', {
+      ip: (req as { headers: { get(n: string): string | null } }).headers.get('x-forwarded-for') ?? 'unknown',
+      ts: new Date().toISOString(),
+    })
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -39,6 +43,13 @@ export function requireCronAuth(req: { headers: { get(name: string): string | nu
   const authHeader = req.headers.get('authorization')
   const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
   if (!token || !safeEqual(token, secret)) {
+    const ip = (req as { headers: { get(n: string): string | null } }).headers.get('x-forwarded-for') ?? 'unknown'
+    const isCron = (req as { headers: { get(n: string): string | null } }).headers.get('x-vercel-cron') === '1'
+    if (isCron) {
+      console.error('[auth] Cron 認証失敗（x-vercel-cron=1）', { ip, ts: new Date().toISOString() })
+    } else {
+      console.warn('[auth] Cron 認証失敗', { ip, ts: new Date().toISOString() })
+    }
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

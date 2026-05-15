@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/client'
+import { createServiceClient } from '@/lib/supabase/server'
 import { requireCronAuth } from '@/lib/auth'
 import { runHeartbeatTask } from '@/lib/agent/heartbeatRunner'
+import type { TaskType } from '@/lib/agent/responseSchemas'
 
-// CXO heartbeat runs 5 sequential AI calls
+// CXO heartbeat runs 5 parallel AI calls
 export const maxDuration = 300
 
 // Business-specific CXO tasks (CMO + CTO)
-const BUSINESS_TASKS: Record<string, { role: string; prompt: string; task_type: string }> = {
+const BUSINESS_TASKS: Record<string, { role: string; prompt: string; task_type: TaskType }> = {
   affiliate_seo: {
     role: 'CMO',
     task_type: 'market_research',
@@ -22,14 +23,14 @@ Consider social strategies, landing page improvements, and pricing. Keep each pr
   },
   game_ads: {
     role: 'CTO',
-    task_type: 'mvp_spec',
+    task_type: 'cto_review',
     prompt: `You are a game development CTO. Propose 3 engagement improvement ideas for Puzzle Games (Sudoku and hiragana matching games with AdSense revenue).
 Consider feature additions, UX improvements, and SEO optimization. Keep each proposal to 2-3 lines.`,
   },
 }
 
 // Cross-functional CXO tasks (COO + CFO) — common across all businesses
-const CROSS_CXO_TASKS = [
+const CROSS_CXO_TASKS: Array<{ role: string; task_type: TaskType; prompt: string }> = [
   {
     role: 'COO',
     task_type: 'ops_review',
@@ -73,28 +74,23 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: 'No startups found' })
   }
 
-  const results = []
-  let totalCost = 0
-
-  // Business-specific tasks (CMO / CTO)
-  for (const startup of startups) {
-    const task = BUSINESS_TASKS[startup.business_type]
-    if (!task) continue
-
-    const { content, costUsd } = await runHeartbeatTask(supabase, {
-      model: 'claude-sonnet-4-6',
-      maxTokens: 800,
-      prompt: task.prompt,
-      systemPrompt: `You are the ${task.role} of Launchpad. Provide actionable and specific recommendations.`,
-      startupId: startup.id,
-      taskType: task.task_type,
+  // Business-specific (CMO / CTO) + Cross-functional (COO / CFO) を並列実行
+  const businessPromises = startups
+    .filter(s => BUSINESS_TASKS[s.business_type])
+    .map(async startup => {
+      const task = BUSINESS_TASKS[startup.business_type]
+      const { content, costUsd } = await runHeartbeatTask(supabase, {
+        model: 'claude-sonnet-4-6',
+        maxTokens: 800,
+        prompt: task.prompt,
+        systemPrompt: `You are the ${task.role} of Launchpad. Provide actionable and specific recommendations.`,
+        startupId: startup.id,
+        taskType: task.task_type,
+      })
+      return { startup: startup.name, role: task.role, suggestions: content, costUsd }
     })
-    totalCost += costUsd
-    results.push({ startup: startup.name, role: task.role, suggestions: content })
-  }
 
-  // Cross-functional tasks (COO / CFO)
-  for (const task of CROSS_CXO_TASKS) {
+  const crossPromises = CROSS_CXO_TASKS.map(async task => {
     const { content, costUsd } = await runHeartbeatTask(supabase, {
       model: 'claude-sonnet-4-6',
       maxTokens: 800,
@@ -103,9 +99,12 @@ export async function GET(req: NextRequest) {
       startupId: startups[0].id,
       taskType: task.task_type,
     })
-    totalCost += costUsd
-    results.push({ role: task.role, report: content })
-  }
+    return { role: task.role, report: content, costUsd }
+  })
+
+  const allResults = await Promise.all([...businessPromises, ...crossPromises])
+  const totalCost = allResults.reduce((sum, r) => sum + r.costUsd, 0)
+  const results = allResults.map(({ costUsd: _c, ...rest }) => rest)
 
   return NextResponse.json({ ok: true, total_cost_usd: totalCost, results })
 }
