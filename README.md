@@ -1,24 +1,16 @@
 # StartupRobos
 
-AI CXO team that runs digital businesses for you. Just talk.
+AI team that builds and runs businesses for you. You just talk.
 
----
+## 3 Steps
 
-## Quick Start (5 minutes)
+1. **[Use this template](https://github.com/Robo-Co-op/StartupRobos/generate)** to create your own repo
+2. **Open it in [Claude Code](https://claude.ai/download)**
+3. **Say:** _"I want to startup. https://github.com/YourUserName/StartupRobos/"_
 
-1. **Create your instance** — Click **"Use this template"** on [Robo-Co-op/StartupRobos](https://github.com/Robo-Co-op/StartupRobos) (NOT fork!)
-2. **Clone it**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/your-instance-name.git
-   cd your-instance-name
-   npm install
-   ```
-3. **Open in Claude Code Desktop** and say:
-   > **"I want to startup"**
+Done. The AI picks businesses, sets up infra, and starts building.
 
-That's it. The AI walks you through everything — picks businesses, sets up infra, starts building.
-
-> ⚠️ **Do NOT clone or work inside the upstream `Robo-Co-op/StartupRobos` repo directly.**
+> ⚠️ **Don't work directly in the upstream `Robo-Co-op/StartupRobos` repo.**
 > That's the framework. Your businesses live in *your* template instance. See [Why?](#why-use-this-template-not-fork-or-clone) below.
 
 ---
