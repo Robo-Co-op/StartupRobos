@@ -7,6 +7,10 @@
     {
       "path": "/api/heartbeat/cxo",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/heartbeat/dream",
+      "schedule": "0 3 * * 0"
     }
   ]
 }

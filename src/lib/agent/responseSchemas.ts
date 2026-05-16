@@ -22,6 +22,7 @@ export type TaskType =
   | 'budget_review'   // CFO heartbeat タスク
   | 'ceo_review'      // CEO heartbeat タスク（全スタートアップ俯瞰）
   | 'cto_review'      // CTO heartbeat タスク（技術・エンゲージメント改善提案）
+  | 'dream'           // Dreaming — agent memory synthesis from past sessions
 
 // --- Zod schemas for each task type ---
 export const PivotAnalysisSchema = z.object({
@@ -66,6 +67,7 @@ export const RESPONSE_SCHEMAS: Record<TaskType, z.ZodTypeAny> = {
   budget_review: FreeTextSchema,     // 自由テキスト（CFO レポート）
   ceo_review: FreeTextSchema,        // 自由テキスト（CEO 俯瞰レポート）
   cto_review: FreeTextSchema,        // 自由テキスト（CTO 改善提案レポート）
+  dream: FreeTextSchema,              // 自由テキスト（Dreaming メモリ合成）
 }
 
 /**

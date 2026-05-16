@@ -1,3 +1,4 @@
+import { getLatestDreamMemory } from './dreaming'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { CXO_SYSTEM_PROMPTS, CXO_MODELS, type CXORole } from './cxo'
 import { extractText } from '@/lib/agent/responseSchemas'
@@ -69,15 +70,29 @@ export async function runCouncil(
 
   const byRole = Object.fromEntries(reports.map(r => [r.role, r])) as Record<Exclude<CXORole, 'ceo'>, CXOReport>
 
-  // Step 2: CEO synthesizes all CXO reports
-  const ceoPrompt = [
+  // Step 2: Fetch dream memory (non-blocking — falls back to no memory on error)
+  let pastLearnings: string | null = null
+  try {
+    pastLearnings = await getLatestDreamMemory(supabase, startupId)
+  } catch (err) {
+    console.warn('[council] Failed to fetch dream memory, proceeding without:', err)
+  }
+
+  // Step 3: CEO synthesizes all CXO reports (+ past learnings if available)
+  const ceoPromptParts = [
     `## Startup Context\n${startupContext}`,
     `## Agenda\n${agenda}`,
+  ]
+  if (pastLearnings) {
+    ceoPromptParts.push(`## Past Learnings\n${pastLearnings}`)
+  }
+  ceoPromptParts.push(
     `## CTO Report\n${byRole.cto.content}`,
     `## CMO Report\n${byRole.cmo.content}`,
     `## COO Report\n${byRole.coo.content}`,
     `## CFO Report\n${byRole.cfo.content}`,
-  ].join('\n\n')
+  )
+  const ceoPrompt = ceoPromptParts.join('\n\n')
 
   const ceoModel = CXO_MODELS['ceo']
   const ceoResponse = await anthropic.messages.create({
