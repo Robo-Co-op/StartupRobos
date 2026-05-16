@@ -9,7 +9,6 @@ import {
 } from './responseSchemas'
 import { anthropic } from './anthropicClient'
 
-export type { ModelName }
 
 export interface AgentConfig {
   userId: string

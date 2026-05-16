@@ -39,7 +39,7 @@ export const MarketResearchSchema = z.object({
  * JSON構造を期待しないタスク（ops_review / budget_review / ceo_review / cto_review）に使用。
  * MarketResearchSchema（min: 20）より制約が緩く、短いシステムレポートにも対応する。
  */
-export const FreeTextSchema = z.object({
+const FreeTextSchema = z.object({
   content: z.string().min(1),
 })
 
