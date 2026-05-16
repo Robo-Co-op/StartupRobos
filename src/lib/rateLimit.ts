@@ -25,6 +25,7 @@ export function makeRateLimiter(
   if (!url || !token) {
     if (process.env.NODE_ENV === 'production') {
       // 本番では起動時ではなくリクエスト時に throw（next build を壊さない lazy throw パターン）
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
       return async (_userId: string) => {
         throw new Error(
           '[rateLimit] UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN が未設定です。' +

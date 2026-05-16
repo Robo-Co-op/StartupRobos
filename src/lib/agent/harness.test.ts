@@ -130,7 +130,8 @@ describe('runAgent — 正常系', () => {
 
     await runAgent(BASE_CONFIG, 'prompt', supabase)
 
-    const insertCall = (supabase._mockInsert as ReturnType<typeof vi.fn>)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const insertCall = ((supabase as any)._mockInsert as ReturnType<typeof vi.fn>)
     expect(insertCall).toHaveBeenCalledWith(
       expect.objectContaining({
         user_id: 'user-abc',
@@ -155,7 +156,8 @@ describe('runAgent — 正常系', () => {
     )
 
     expect(result.structured).toBeNull()
-    const insertCall = (supabase._mockInsert as ReturnType<typeof vi.fn>)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const insertCall = ((supabase as any)._mockInsert as ReturnType<typeof vi.fn>)
     expect(insertCall).toHaveBeenCalledWith(
       expect.objectContaining({ result: 'plain text without json' })
     )

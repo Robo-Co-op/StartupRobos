@@ -104,7 +104,8 @@ export async function GET(req: NextRequest) {
 
   const allResults = await Promise.all([...businessPromises, ...crossPromises])
   const totalCost = allResults.reduce((sum, r) => sum + r.costUsd, 0)
-  const results = allResults.map(({ costUsd: _c, ...rest }) => rest)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const results = allResults.map(({ costUsd: _costUsd, ...rest }) => rest)
 
   return NextResponse.json({ ok: true, total_cost_usd: totalCost, results })
 }
