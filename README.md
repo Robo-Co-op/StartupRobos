@@ -131,6 +131,14 @@ git merge upstream/main
 
 **Do not create a standalone repo for a single business.** A business is not a framework.
 
+## Community
+
+Questions, ideas, and showcases welcome:
+
+- **Discord:** [discord.gg/q8ubqBtCd](https://discord.gg/q8ubqBtCd) — `#startup-robos` channel
+
+---
+
 ## License
 
 MIT — template freely. Upstream improvements welcome.
