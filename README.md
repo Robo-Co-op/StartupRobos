@@ -131,6 +131,14 @@ git merge upstream/main
 
 **Do not create a standalone repo for a single business.** A business is not a framework.
 
+## Support
+
+StartupRobos is free and open-source, built for refugees through [Co-op Lab](https://robocoop.notion.site/cooplab). Donations cover API costs and keep the program running.
+
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/Robo-Co-op?style=flat&logo=github&label=Sponsor)](https://github.com/sponsors/Robo-Co-op)
+
+---
+
 ## Community
 
 Questions, ideas, and showcases welcome:
